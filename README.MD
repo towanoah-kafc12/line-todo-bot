@@ -1,59 +1,97 @@
-# Project Name
+# line-todo-bot
 
 ## Overview
 
-このリポジトリは、AI 駆動で AWS インフラ開発とアプリケーション開発を進めるためのテンプレートだ。
-骨組みだけで終わらせず、PJ 開始時に方向性を決めてテンプレートから実プロジェクトへ育てるフェーズまで含めている。
+`line-todo-bot` は、LINE Bot を UI にして Todoist の特定 section を家の共有 TODO として扱うためのアプリだ。
+同居人は LINE だけを使い、管理者は Todoist も LINE も使える前提で、データの正本は Todoist に固定する。
 
-## Goal
+## Current Status
 
-- AI エージェントが迷わず作業を始められる状態を作る
-- PJ の方向性、技術、完了条件を最初に固める導線を持たせる
-- 不具合、不明点、設計変更の関係を追える状態を保つ
-- 人間が見ても構造と運用ルールがすぐ分かる状態を保つ
+いま実装できているのは、MVP の土台部分だよ。
 
-## Project Build Flow
+- Node.js / TypeScript の実行基盤
+- env 検証
+- `GET /` と `GET /health`
+- `POST /webhook`
+- LINE Webhook 署名検証
+- allowlist による userId 認可
+- `みる` `追加` `完了` `削除` `編集` の command parser
+- Todoist gateway
+- 番号付き一覧 state
+- command handler
+- Reply API 送信の配線
 
-最初の流れは次の順を想定している。
+まだ未実装のもの:
 
-1. `docs/BOOTSTRAP.md` でゴール、スコープ、未確定事項を整理する
-2. `docs/TECH-STACK.md` で技術選定と検証方法を決める
-3. `docs/DELIVERY.md` で AI の完了条件と停止条件を明確にする
-4. 未確定事項は `docs/tracking/common/QUESTIONS.md` に記録する
-5. 実装や設計変更が入ったら `docs/PROJECT.md` と `docs/ARCHITECTURE.md` の改訂履歴を更新する
+- ローカル HTTPS 公開手順の確定
+- 実 LINE / 実 Todoist を使った疎通確認
 
-全部を最初から完璧に決めなくてもよくて、足りない部分は「仮説」か「未確定」として管理する前提だ。
+## Target Users
 
-## Quick Start
+- 管理者: Todoist と LINE の両方で共有 TODO を管理する
+- 同居人 A: LINE Bot だけで共有 TODO を扱う
+
+## Main Commands
+
+- `みる`
+- `追加 {内容}`
+- `完了 {番号}`
+- `削除 {番号}`
+- `編集 {番号} {新しい内容}`
+
+## Environment Variables
+
+`.env.example` を元に `.env` を作る。
+
+- `LINE_CHANNEL_SECRET`
+- `LINE_CHANNEL_ACCESS_TOKEN`
+- `LINE_ALLOWED_USER_IDS`
+- `TODOIST_API_TOKEN`
+- `TODOIST_PROJECT_ID`
+- `TODOIST_SECTION_ID`
+- `PORT`
+- `LIST_STATE_TTL_SECONDS`
+
+## Local Development
 
 ```bash
-./scripts/project-build.sh
-./scripts/bootstrap.sh
+npm install
+npm run dev
+```
+
+デフォルトでは次の endpoint が立つ。
+
+- `GET /`
+- `GET /health`
+- `POST /webhook`
+
+## Validation
+
+```bash
 ./scripts/lint.sh
 ./scripts/test.sh
 ```
 
-## Directory
+または直接:
 
-- `AGENTS.md`: エージェント向けの常設ルール
-- `docs/BOOTSTRAP.md`: PJ 方向性を決める初期ビルドフェーズ
-- `docs/TECH-STACK.md`: 技術選定と検証方針
-- `docs/DELIVERY.md`: AI の作業完了条件と停止条件
-- `docs/SKILLS.md`: 標準 skill と project skill の一覧、追加ルール
-- `docs/PROJECT.md`: 目的、スコープ、成功条件
-- `docs/ARCHITECTURE.md`: 構成、責務、運用観点
-- `docs/TASKS.md`: 直近タスクの管理
-- `docs/tracking/`: 不具合と不明点の一覧管理
-- `skills/`: 長い手順や専門知識の置き場
-- `skills/INDEX.md`: 作業と skill の対応をすぐ引くための索引
-- `skills/skill-creator/`: repo 標準搭載の Skill 作成用 skill
-- `infra/`: インフラコードの置き場
-- `app/`: アプリケーションコードの置き場
-- `scripts/`: セットアップや検証などの実行入口
+```bash
+npm run build
+npm run lint
+npm run test
+```
 
-## Notes
+## LINE / Todoist Setup
 
-このテンプレートは、実装そのものより運用の型を先に作る設計だ。
-技術が確定したら、`scripts/` の中身と `docs/TECH-STACK.md` の検証定義を一致させていく。
-定型作業が見えてきたら、repo に同梱した `skill-creator` を使って Skill 化し、`docs/SKILLS.md` に登録する前提にしている。
-そのときは `skills/INDEX.md` と `AGENTS.md` も同じ変更で更新する。
+セットアップの詳細は次を見る。
+
+- `docs/setup.md`
+- `docs/requirements.md`
+- `docs/ARCHITECTURE.md`
+
+## Common Troubles
+
+- `Invalid environment variables`: `.env` の必須値が不足している
+- `Invalid LINE webhook signature`: channel secret と webhook 署名が一致していない
+- `この操作は許可されていないよ`: `LINE_ALLOWED_USER_IDS` に userId が入っていない
+- LINE から疎通できない: ローカル URL が HTTPS で公開されていない
+- `./scripts/*.sh` が動かない: Bash がない環境では `npm run lint` と `npm run test` を直接使う
