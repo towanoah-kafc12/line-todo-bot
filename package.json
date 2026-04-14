@@ -11,7 +11,11 @@
     "build": "npx tsc --project tsconfig.json",
     "start": "node dist/app/src/index.js",
     "lint": "npx eslint .",
-    "test": "npx vitest run"
+    "test": "npx vitest run",
+    "rich-menu:apply": "node scripts/line-rich-menu.mjs apply-default",
+    "rich-menu:list": "node scripts/line-rich-menu.mjs list",
+    "rich-menu:clear": "node scripts/line-rich-menu.mjs clear-default",
+    "rich-menu:delete": "node scripts/line-rich-menu.mjs delete"
   },
   "dependencies": {
     "@doist/todoist-sdk": "^9.0.0",

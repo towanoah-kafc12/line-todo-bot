@@ -2,7 +2,7 @@
 
 ## System Context
 
-- Frontend: なし。利用者 UI は LINE の 1 対 1 チャット
+- Frontend: 独立した画面はなし。利用者 UI は LINE の 1 対 1 チャット、グループ、デフォルトのリッチメニュー
 - Backend/API: Node.js + TypeScript の小さな Webhook サーバ
 - Database: MVP では永続 DB なし。番号付き一覧の対応表はメモリ保持を暫定採用
 - AWS: 対象外。ローカル PC ホストのみ
@@ -49,6 +49,9 @@ MVP では本格的な IaC は置かない。
 4. text message を明示コマンドとして parse する
 5. Todoist client が対象 `project_id` `section_id` の範囲だけ読む / 書く
 6. 操作結果を短い日本語メッセージに整形して Reply API で返す
+
+リッチメニューは MVP では `message action` を使い、押下時に `みる` などの既存テキストコマンドを送る方針にする。
+理由は、`postback` を新設せずに既存 parser と handler を再利用できるからだよ。
 
 ## Data Flow
 
@@ -100,6 +103,9 @@ MVP では本格的な IaC は置かない。
 - デプロイ方針: ローカル常駐プロセス + HTTPS 公開経路
 - ロールバック方針: コードを前版に戻し、Webhook URL を安定 endpoint のまま維持する
 
+リッチメニュー運用では、LINE Official Account Manager で作るか Messaging API で作るかを混在させない。
+理由は、LINE 公式で同一リッチメニューを両方のツールから編集できないとされているからだよ。
+
 ## Change Management
 
 - 設計変更が発生したら、関連する `BUG-*` または `Q-*` の ID を改訂履歴へ残す
@@ -113,3 +119,4 @@ MVP では本格的な IaC は置かない。
 | 2026-04-11 | 0.1 | 初期テンプレート作成 | - |
 | 2026-04-11 | 0.2 | 課題管理と設計改訂の連動ルールを追加 | - |
 | 2026-04-12 | 0.3 | LINE Webhook と Todoist section 連携の想定構成を追加 | Q-COM-002, Q-COM-003, Q-COM-004 |
+| 2026-04-14 | 0.4 | デフォルトのリッチメニューを既存テキストコマンドへつなぐ方針を追加 | - |

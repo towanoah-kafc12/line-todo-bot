@@ -233,6 +233,52 @@ npx wrangler tunnel quick-start http://localhost:3000
 - `追加 買い物` で対象 section に task が増える
 - `完了 1` `削除 1` `編集 1 牛乳を買う` が対象 task にだけ作用する
 
+## Rich Menu Side
+
+### 1. Use the default rich menu managed by Messaging API
+
+今回は LINE Official Account Manager ではなく Messaging API で default rich menu を管理する。
+理由は、設定をコード化して再現しやすくするためだよ。
+
+注意:
+
+- 同じ rich menu を Manager と Messaging API の両方から編集しない
+- デスクトップ版 LINE では rich menu は表示されない
+
+### 2. Apply the default rich menu
+
+この repo には、主要コマンドへ誘導する default rich menu 定義と画像を置いてある。
+`一覧を見る` は `message action` で `みる` を即送信し、`追加する` `完了する` `編集する` `削除する` は `postback action` でキーボードを開いてコマンド文字列を事前入力する。
+理由は、可変入力がある操作でも既存のテキストコマンド設計を崩さずに使えるからだよ。
+
+実行コマンド:
+
+```bash
+npm run rich-menu:apply
+```
+
+このコマンドがやること:
+
+1. `assets/line/default-rich-menu.json` を使って rich menu を作る
+2. `assets/line/default-rich-menu.png` を画像として upload する
+3. 作成した rich menu を default rich menu に設定する
+
+補助コマンド:
+
+```bash
+npm run rich-menu:list
+npm run rich-menu:clear
+npm run rich-menu:delete -- <richMenuId>
+```
+
+### 3. Verify the default rich menu
+
+- スマホ版 LINE の個人チャットで rich menu が見える
+- グループでも rich menu が見える
+- `一覧を見る` を押すと `みる` が送られる
+- `追加する` `完了する` `編集する` `削除する` を押すと、入力欄に対応するコマンドが補完される
+- Bot が Reply API で一覧を返す
+
 ## Common Failure Points
 
 - Webhook URL が HTTPS でない
@@ -246,3 +292,4 @@ npx wrangler tunnel quick-start http://localhost:3000
 | Date | Version | Summary | Related IDs |
 | --- | --- | --- | --- |
 | 2026-04-12 | 0.1 | LINE と Todoist の公式調査に基づく初版作成 | Q-COM-004 |
+| 2026-04-14 | 0.2 | Messaging API で default rich menu を適用する手順を追加 | - |

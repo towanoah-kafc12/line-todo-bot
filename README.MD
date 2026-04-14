@@ -20,11 +20,12 @@
 - 番号付き一覧 state
 - command handler
 - Reply API 送信の配線
+- default rich menu を Messaging API で設定するスクリプト
 
-まだ未実装のもの:
+まだ未実装または未確定のもの:
 
-- ローカル HTTPS 公開手順の確定
-- 実 LINE / 実 Todoist を使った疎通確認
+- AWS への本番デプロイ
+- リッチメニューの追加ボタン設計
 
 ## Target Users
 
@@ -87,6 +88,20 @@ npm run test
 - `docs/setup.md`
 - `docs/requirements.md`
 - `docs/ARCHITECTURE.md`
+
+default rich menu を適用するコマンド:
+
+```bash
+npm run rich-menu:apply
+```
+
+いまの rich menu では次の入口を出しているよ。
+
+- `一覧を見る`: `みる` を即送信する
+- `追加する`: 入力欄に `追加 ` を入れてキーボードを開く
+- `完了する`: 入力欄に `完了 ` を入れてキーボードを開く
+- `編集する`: 入力欄に `編集 ` を入れてキーボードを開く
+- `削除する`: 入力欄に `削除 ` を入れてキーボードを開く
 
 ## Common Troubles
 
