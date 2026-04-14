@@ -28,7 +28,7 @@ describe("default rich menu definition", () => {
             x: 0,
             y: 0,
             width: 834,
-            height: 843
+            height: 720
           },
           action: {
             type: "message",
@@ -41,7 +41,7 @@ describe("default rich menu definition", () => {
             x: 834,
             y: 0,
             width: 833,
-            height: 843
+            height: 720
           },
           action: {
             type: "postback",
@@ -56,7 +56,7 @@ describe("default rich menu definition", () => {
             x: 1667,
             y: 0,
             width: 833,
-            height: 843
+            height: 720
           },
           action: {
             type: "postback",
@@ -68,10 +68,10 @@ describe("default rich menu definition", () => {
         },
         {
           bounds: {
-            x: 1668,
-            y: 843,
-            width: 416,
-            height: 843
+            x: 1860,
+            y: 720,
+            width: 480,
+            height: 483
           },
           action: {
             type: "postback",
@@ -83,10 +83,10 @@ describe("default rich menu definition", () => {
         },
         {
           bounds: {
-            x: 2084,
-            y: 843,
-            width: 416,
-            height: 843
+            x: 1860,
+            y: 1203,
+            width: 480,
+            height: 483
           },
           action: {
             type: "postback",
