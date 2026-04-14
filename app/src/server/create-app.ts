@@ -65,6 +65,10 @@ export const createApp = (config: AppConfig, dependencies: CreateAppDependencies
     });
 
     if (!result.ok) {
+      console.warn("[webhook] rejected request", {
+        statusCode: result.statusCode,
+        errorMessage: result.errorMessage
+      });
       return context.json(
         {
           ok: false,
@@ -81,18 +85,41 @@ export const createApp = (config: AppConfig, dependencies: CreateAppDependencies
         (event.status === "accepted" || event.status === "rejected"),
     );
 
-    await Promise.all(
-      replyableEvents.map((event) =>
-        messagingClient.replyMessage({
-          replyToken: event.replyToken!,
-          messages: [
-            buildTextReplyMessage(
-              event.status === "accepted" ? event.replyMessage : event.errorMessage,
-            )
-          ]
-        }),
-      ),
-    );
+    console.log("[webhook] processed events", {
+      acceptedEvents: result.events.filter((event) => event.status === "accepted").length,
+      rejectedEvents: result.events.filter((event) => event.status === "rejected").length,
+      ignoredEvents: result.events.filter((event) => event.status === "ignored").length,
+      replyableEvents: replyableEvents.length,
+      eventSummaries: result.events.map((event) => ({
+        status: event.status,
+        reason: "reason" in event ? event.reason : undefined,
+        userId: "userId" in event ? (event.userId ?? null) : null
+      }))
+    });
+
+    try {
+      await Promise.all(
+        replyableEvents.map((event) =>
+          messagingClient.replyMessage({
+            replyToken: event.replyToken,
+            messages: [
+              buildTextReplyMessage(
+                event.status === "accepted" ? event.replyMessage : event.errorMessage,
+              )
+            ]
+          }),
+        ),
+      );
+    } catch (error) {
+      console.error("[webhook] failed to send LINE reply", error);
+      return context.json(
+        {
+          ok: false,
+          errorMessage: "Failed to send LINE reply"
+        },
+        502,
+      );
+    }
 
     return context.json({
       ok: true,

@@ -1,0 +1,218 @@
+﻿Diagnose log at 2026-04-12T08:15:24Z
+
+AppPath: C:\Program Files\Git\mingw64\bin\git-credential-manager.exe
+InstallDir: C:\Program Files\Git\mingw64\bin\
+Version: 2.6.1+786ab03440ddc82e807a97c0e540f5247e44cec6
+
+------------
+Diagnostic: Environment
+Skipped: False
+Success: True
+Exception: None
+Log:
+OSType: Windows
+OSVersion: 10.0 (build 26200)
+Reading environment variables... OK
+ Variables:
+HOMEPATH=\Users\ykbkc
+DriverData=C:\Windows\System32\Drivers\DriverData
+COMPUTERNAME=G-GEAR
+GIT_TRACE2_PARENT_SID=e7daa184-a591-4163-addb-eaa549d3e9a2
+CommonProgramFiles(x86)=C:\Program Files (x86)\Common Files
+OneDrive=C:\Users\ykbkc\OneDrive
+CODEX_THREAD_ID=019d8081-6a58-7552-a455-4d8f8f1a018a
+WT_PROFILE_ID={574e775e-4f2a-5b96-ac1e-a2962a402336}
+TMPDIR=C:\Users\ykbkc\AppData\Local\Temp
+SESSIONNAME=Console
+VSCODE_CLI=1
+TMP=C:\Users\ykbkc\AppData\Local\Temp
+PROCESSOR_REVISION=6102
+PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL
+NODE_UNC_HOST_ALLOWLIST=wsl.localhost
+POWERSHELL_DISTRIBUTION_CHANNEL=MSI:Windows 10 Home
+TEMP=C:\Users\ykbkc\AppData\Local\Temp
+LOCALAPPDATA=C:\Users\ykbkc\AppData\Local
+MSYSTEM=MINGW64
+TERM=xterm-256color
+PROCESSOR_IDENTIFIER=AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD
+ProgramData=C:\ProgramData
+VSCODE_ESM_ENTRYPOINT=vs/workbench/api/node/extensionHostProcess
+USERDOMAIN=G-GEAR
+windir=C:\WINDOWS
+PROCESSOR_LEVEL=25
+NUMBER_OF_PROCESSORS=16
+PATH=C:/Program Files/Git/mingw64/libexec/git-core;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\ykbkc\bin;C:\Program Files\PowerShell\7;C:\Users\ykbkc\.codex\tmp\arg0\codex-arg00cbQwz;C:\Program Files\PowerShell\7;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\Tailscale\;C:\Program Files\PowerShell\7\;C:\Program Files\PowerShell\7;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\nodejs\;C:\Program Files\Git\cmd;C:\Program Files\PowerShell\7\;C:\Program Files\Amazon\AWSCLIV2\;C:\Program Files\Docker\Docker\resources\bin;C:\Users\ykbkc\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\ykbkc\AppData\Local\Programs\Python\Python313\;C:\Users\ykbkc\AppData\Local\Programs\Python\Launcher\;C:\Users\ykbkc\AppData\Local\Microsoft\WindowsApps;C:\Users\ykbkc\AppData\Local\Programs\Microsoft VS Code\bin;;C:\Users\ykbkc\.lmstudio\bin;C:\Users\ykbkc\AppData\Roaming\npm;C:\Users\ykbkc\AppData\Local\Microsoft\WinGet\Packages\Genymobile.scrcpy_Microsoft.Winget.Source_8wekyb3d8bbwe\scrcpy-win64-v3.3.3;C:\Users\ykbkc\AppData\Local\Programs\Kiro\bin;C:\Users\ykbkc\AppData\Local\Programs\Antigravity\bin;C:\Users\ykb;C:\Users\ykbkc\AppData\Local\Programs\Ollama;C:\Users\ykbkc\AppData\Local\PowerToys\DSCModules\;c:\Users\ykbkc\.vscode\extensions\openai.chatgpt-26.5409.20454-win32-x64\bin\windows-x86_64
+VSCODE_IPC_HOOK=\\.\pipe\a7afb0c2-1.115.0-main-sock
+PROMPT=$P$G
+configsetroot=C:\WINDOWS\ConfigSetRoot
+ProgramFiles(x86)=C:\Program Files (x86)
+PUBLIC=C:\Users\Public
+VSCODE_NLS_CONFIG={"userLocale":"ja","osLocale":"ja","resolvedLanguage":"ja","defaultMessagesFile":"C:\\Users\\ykbkc\\AppData\\Local\\Programs\\Microsoft VS Code\\41dd792b5e\\resources\\app\\out\\nls.messages.json","languagePack":{"translationsConfigFile":"C:\\Users\\ykbkc\\AppData\\Roaming\\Code\\clp\\05404bc7ed9477c5973b3e7b583aedd2.ja\\tcf.json","messagesFile":"C:\\Users\\ykbkc\\AppData\\Roaming\\Code\\clp\\05404bc7ed9477c5973b3e7b583aedd2.ja\\41dd792b5e652393e7787322889ed5fdc58bd75b\\nls.messages.json","corruptMarkerFile":"C:\\Users\\ykbkc\\AppData\\Roaming\\Code\\clp\\05404bc7ed9477c5973b3e7b583aedd2.ja\\corrupted.info"},"locale":"ja","availableLanguages":{"*":"ja"},"_languagePackId":"05404bc7ed9477c5973b3e7b583aedd2.ja","_languagePackSupport":true,"_translationsConfigFile":"C:\\Users\\ykbkc\\AppData\\Roaming\\Code\\clp\\05404bc7ed9477c5973b3e7b583aedd2.ja\\tcf.json","_cacheRoot":"C:\\Users\\ykbkc\\AppData\\Roaming\\Code\\clp\\05404bc7ed9477c5973b3e7b583aedd2.ja","_resolvedLanguagePackCoreLocation":"C:\\Users\\ykbkc\\AppData\\Roaming\\Code\\clp\\05404bc7ed9477c5973b3e7b583aedd2.ja\\41dd792b5e652393e7787322889ed5fdc58bd75b","_corruptedFile":"C:\\Users\\ykbkc\\AppData\\Roaming\\Code\\clp\\05404bc7ed9477c5973b3e7b583aedd2.ja\\corrupted.info"}
+PYTHONIOENCODING=UTF-8
+CommonProgramFiles=C:\Program Files (x86)\Common Files
+3DVPATH=C:\AMD\Chipset_Software\Binaries\3D_V-Cache_Performance_Optimizer_Driver\
+OLLAMA_HOST=0.0.0.0:11434
+CHROME_CRASHPAD_PIPE_NAME=\\.\pipe\crashpad_24944_XBGBNQABQHWEKZWS
+PLINK_PROTOCOL=ssh
+COLORTERM=truecolor
+ProgramW6432=C:\Program Files
+ELECTRON_NO_ATTACH_CONSOLE=1
+ProgramFiles=C:\Program Files (x86)
+VSCODE_PID=24944
+DEBUG=release
+VSCODE_L10N_BUNDLE_LOCATION=file:///c%3A/Users/ykbkc/.vscode/extensions/ms-ceintl.vscode-language-pack-ja-1.110.2026041113/translations/extensions/vscode.json-language-features.i18n.json
+VSCODE_CODE_CACHE_PATH=C:\Users\ykbkc\AppData\Roaming\Code\CachedData\41dd792b5e652393e7787322889ed5fdc58bd75b
+PYTHONUTF8=1
+RlsSvcPort=22112
+SystemRoot=C:\WINDOWS
+WT_SESSION=7361ef18-7569-4c1c-b9be-abc358da39c1
+HOME=C:\Users\ykbkc
+VSCODE_HANDLES_UNCAUGHT_ERRORS=true
+LC_CTYPE=C.UTF-8
+CommonProgramW6432=C:\Program Files\Common Files
+LOGONSERVER=\\G-GEAR
+VSCODE_CWD=C:\Users\ykbkc\work\misc\line-todo-bot
+GIT_EXEC_PATH=C:/Program Files/Git/mingw64/libexec/git-core
+CODEX_INTERNAL_ORIGINATOR_OVERRIDE=codex_vscode
+USERDOMAIN_ROAMINGPROFILE=G-GEAR
+APPDATA=C:\Users\ykbkc\AppData\Roaming
+HOMEDRIVE=C:
+RUST_LOG=warn
+ACSetupSvcPort=23210
+PSModulePath=C:\Users\ykbkc\OneDrive\Documents\PowerShell\Modules;C:\Program Files\PowerShell\Modules;c:\program files\powershell\7\Modules;C:\Program Files\WindowsPowerShell\Modules;C:\WINDOWS\system32\WindowsPowerShell\v1.0\Modules
+ELECTRON_RUN_AS_NODE=1
+USERNAME=ykbkc
+PROCESSOR_ARCHITEW6432=AMD64
+WSLENV=WT_SESSION:WT_PROFILE_ID:
+PROCESSOR_ARCHITECTURE=x86
+USERPROFILE=C:\Users\ykbkc
+OS=Windows_NT
+ComSpec=C:\WINDOWS\system32\cmd.exe
+SystemDrive=C:
+VSCODE_CRASH_REPORTER_PROCESS_TYPE=extensionHost
+OneDriveConsumer=C:\Users\ykbkc\OneDrive
+ALLUSERSPROFILE=C:\ProgramData
+
+
+------------
+Diagnostic: File system
+Skipped: False
+Success: True
+Exception: None
+Log:
+Temporary directory is 'C:\Users\ykbkc\AppData\Local\Temp\'...
+Checking basic file I/O...
+Writing to temporary file 'C:\Users\ykbkc\AppData\Local\Temp\d47c4edcab67204062a0d282'... OK
+Reading from temporary file 'C:\Users\ykbkc\AppData\Local\Temp\d47c4edcab67204062a0d282'... OK
+Deleting temporary file 'C:\Users\ykbkc\AppData\Local\Temp\d47c4edcab67204062a0d282'... OK
+Testing IFileSystem instance...
+UserHomePath: C:\Users\ykbkc
+UserDataDirectoryPath: C:\Users\ykbkc\.gcm
+GetCurrentDirectory(): C:\Users\ykbkc\work\misc\line-todo-bot
+
+------------
+Diagnostic: Networking
+Skipped: False
+Success: True
+Exception: None
+Log:
+Checking networking and HTTP stack...
+Creating HTTP client... OK
+IsNetworkAvailable: True
+Sending HEAD request to http://example.com...Sending HEAD request to https://example.com... OK
+ OK
+Acquiring free TCP port... OK
+Testing local HTTP loopback connections...
+Creating new HTTP listener for http://localhost:50097/... OK
+Waiting for loopback connection... OK
+Writing response... OK
+Waiting for response data... OK
+Loopback connection data OK
+
+------------
+Diagnostic: Git
+Skipped: False
+Success: True
+Exception: None
+Log:
+Getting Git version... OK
+Git version is '2.50.1.windows.1'
+Locating current repository...Git repository at 'C:/Users/ykbkc/work/misc/line-todo-bot/.git'
+ OK
+Listing all Git configuration... OK
+Git configuration:
+file:C:/Program Files/Git/etc/gitconfig	diff.astextplain.textconv=astextplain
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.clean=git-lfs clean -- %f
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.smudge=git-lfs smudge -- %f
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.process=git-lfs filter-process
+file:C:/Program Files/Git/etc/gitconfig	filter.lfs.required=true
+file:C:/Program Files/Git/etc/gitconfig	http.sslbackend=schannel
+file:C:/Program Files/Git/etc/gitconfig	core.autocrlf=true
+file:C:/Program Files/Git/etc/gitconfig	core.fscache=true
+file:C:/Program Files/Git/etc/gitconfig	core.symlinks=false
+file:C:/Program Files/Git/etc/gitconfig	pull.rebase=false
+file:C:/Program Files/Git/etc/gitconfig	credential.https://dev.azure.com.usehttppath=true
+file:C:/Program Files/Git/etc/gitconfig	init.defaultbranch=main
+file:C:/Users/ykbkc/.gitconfig	user.email=yk.bkcat.0411@gmail.com
+file:C:/Users/ykbkc/.gitconfig	user.name=towanoah
+file:C:/Users/ykbkc/.gitconfig	credential.https://git-codecommit.ap-northeast-1.amazonaws.com/v1/repos/notes_private.provider=generic
+file:C:/Users/ykbkc/.gitconfig	credential.https://git-codecommit.ap-northeast-1.amazonaws.com.provider=generic
+file:C:/Users/ykbkc/.gitconfig	credential.https://git-codecommit.ap-northeast-1.amazonaws.com.helper=!aws codecommit credential-helper --profile bsper $@
+file:C:/Users/ykbkc/.gitconfig	credential.https://git-codecommit.ap-northeast-1.amazonaws.com.usehttppath=true
+file:C:/Users/ykbkc/.gitconfig	safe.directory=%(prefix)///wsl.localhost/Ubuntu-24.04/home/towanoah/openclaw
+file:C:/Users/ykbkc/.gitconfig	core.sshcommand="C:/Program Files/Git/usr/bin/ssh.exe"
+file:C:/Users/ykbkc/.gitconfig	core.autocrlf=false
+file:C:/Users/ykbkc/.gitconfig	credential.https://git-codecommit.us-east-1.amazonaws.com/v1/repos/kiro-usage-analyzer.provider=generic
+file:C:/Users/ykbkc/.gitconfig	credential.https://git-codecommit.us-east-1.amazonaws.com/v1/repos/kiro-usage-analyzer.helper=!aws codecommit credential-helper --profile bsmaster $@
+file:C:/Users/ykbkc/.gitconfig	credential.https://git-codecommit.us-east-1.amazonaws.com/v1/repos/kiro-usage-analyzer.usehttppath=true
+file:C:/Users/ykbkc/.gitconfig	credential.https://git-codecommit.us-east-1.amazonaws.com.helper=!aws codecommit credential-helper --profile bsper $@
+file:C:/Users/ykbkc/.gitconfig	credential.https://git-codecommit.us-east-1.amazonaws.com.usehttppath=true
+file:C:/Users/ykbkc/.gitconfig	credential.https://git-codecommit.us-east-1.amazonaws.com.provider=generic
+file:.git/config	core.repositoryformatversion=0
+file:.git/config	core.filemode=false
+file:.git/config	core.bare=false
+file:.git/config	core.logallrefupdates=true
+file:.git/config	core.symlinks=false
+file:.git/config	core.ignorecase=true
+file:.git/config	remote.origin.url=https://github.com/towanoah-kafc12/line-todo-bot.git
+file:.git/config	remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+file:.git/config	branch.main.remote=origin
+file:.git/config	branch.main.merge=refs/heads/main
+file:.git/config	branch.main.vscode-merge-base=origin/main
+
+
+------------
+Diagnostic: Credential storage
+Skipped: False
+Success: True
+Exception: None
+Log:
+ICredentialStore instance is of type: CredentialStore
+Writing test credential... OK
+Reading test credential... OK
+Deleting test credential... OK
+
+------------
+Diagnostic: Microsoft authentication (AAD/MSA)
+Skipped: False
+Success: True
+Exception: None
+Log:
+Broker is not enabled.
+Flow type is: Auto
+Gathering MSAL token cache data... OK
+CacheDirectory: C:\Users\ykbkc\AppData\Local\.IdentityService
+CacheFileName: msal.cache
+CacheFilePath: C:\Users\ykbkc\AppData\Local\.IdentityService\msal.cache
+Creating cache helper... OK
+Verifying MSAL token cache persistence... OK
+
+------------
+Diagnostic: GitHub API
+Skipped: False
+Success: True
+Exception: None
+Log:
+Using 'https://github.com/' as API target.
+Querying '/meta' endpoint... OK
+

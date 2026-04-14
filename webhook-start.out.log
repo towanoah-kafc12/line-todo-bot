@@ -1,0 +1,97 @@
+
+> line-todo-bot@0.1.0 start
+> node dist/app/src/index.js
+
+line-todo-bot listening on http://localhost:3000
+[webhook] processed events {
+  acceptedEvents: 1,
+  rejectedEvents: 0,
+  ignoredEvents: 0,
+  replyableEvents: 1,
+  eventSummaries: [
+    {
+      status: 'accepted',
+      reason: undefined,
+      userId: 'U5794073df16bddd6b05ee1575c3ba3b9'
+    }
+  ]
+}
+[webhook] processed events {
+  acceptedEvents: 0,
+  rejectedEvents: 0,
+  ignoredEvents: 1,
+  replyableEvents: 0,
+  eventSummaries: [ { status: 'ignored', reason: 'non-text-message', userId: null } ]
+}
+[webhook] processed events {
+  acceptedEvents: 1,
+  rejectedEvents: 0,
+  ignoredEvents: 0,
+  replyableEvents: 1,
+  eventSummaries: [
+    {
+      status: 'accepted',
+      reason: undefined,
+      userId: 'U0691b3f538c48d21b552d421824d7a41'
+    }
+  ]
+}
+[webhook] processed events {
+  acceptedEvents: 1,
+  rejectedEvents: 0,
+  ignoredEvents: 0,
+  replyableEvents: 1,
+  eventSummaries: [
+    {
+      status: 'accepted',
+      reason: undefined,
+      userId: 'U0691b3f538c48d21b552d421824d7a41'
+    }
+  ]
+}
+[webhook] processed events {
+  acceptedEvents: 1,
+  rejectedEvents: 0,
+  ignoredEvents: 0,
+  replyableEvents: 1,
+  eventSummaries: [
+    {
+      status: 'accepted',
+      reason: undefined,
+      userId: 'U0691b3f538c48d21b552d421824d7a41'
+    }
+  ]
+}
+[webhook] processed events {
+  acceptedEvents: 1,
+  rejectedEvents: 0,
+  ignoredEvents: 0,
+  replyableEvents: 1,
+  eventSummaries: [
+    {
+      status: 'accepted',
+      reason: undefined,
+      userId: 'U0691b3f538c48d21b552d421824d7a41'
+    }
+  ]
+}
+[webhook] processed events {
+  acceptedEvents: 1,
+  rejectedEvents: 0,
+  ignoredEvents: 0,
+  replyableEvents: 1,
+  eventSummaries: [
+    {
+      status: 'accepted',
+      reason: undefined,
+      userId: 'U0691b3f538c48d21b552d421824d7a41'
+    }
+  ]
+}
+[webhook] processed events {
+  acceptedEvents: 0,
+  rejectedEvents: 0,
+  ignoredEvents: 1,
+  replyableEvents: 0,
+  eventSummaries: [ { status: 'ignored', reason: 'non-text-message', userId: null } ]
+}
