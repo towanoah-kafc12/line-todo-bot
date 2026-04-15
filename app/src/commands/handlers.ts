@@ -14,7 +14,7 @@ export type SharedSection = {
 };
 
 export type SharedTodoGateway = {
-  listActiveTasks(): Promise<SharedTask[]>;
+  listActiveTasks(sectionId?: string): Promise<SharedTask[]>;
   listSections(): SharedSection[];
   addTask(content: string, sectionId?: string): Promise<SharedTask>;
   updateTask(taskId: string, content: string): Promise<SharedTask>;
@@ -49,17 +49,18 @@ type HandleConversationTextOptions = {
   text: string;
 };
 
-type StartEditConversationOptions = {
-  gateway: SharedTodoGateway;
-  conversationStateStore: ConversationStateStoreLike;
-  listStateStore: ListStateStoreLike;
-  scopeKey: string;
-};
-
 type StartAddConversationOptions = {
   gateway: SharedTodoGateway;
   conversationStateStore: ConversationStateStoreLike;
   scopeKey: string;
+};
+
+type ContinueSectionConversationOptions = {
+  gateway: SharedTodoGateway;
+  conversationStateStore: ConversationStateStoreLike;
+  listStateStore: ListStateStoreLike;
+  scopeKey: string;
+  sectionId: string;
 };
 
 type StartNumberedConversationOptions = {
@@ -67,11 +68,12 @@ type StartNumberedConversationOptions = {
   conversationStateStore: ConversationStateStoreLike;
   listStateStore: ListStateStoreLike;
   scopeKey: string;
+  sectionId: string;
   prompt: string;
   state:
-    | { type: "awaiting-edit-index" }
-    | { type: "awaiting-complete-index" }
-    | { type: "awaiting-delete-index" };
+    | { type: "awaiting-edit-index"; sectionId: string }
+    | { type: "awaiting-complete-index"; sectionId: string }
+    | { type: "awaiting-delete-index"; sectionId: string };
 };
 
 const formatTaskList = (tasks: SharedTask[]): string => {
@@ -103,6 +105,22 @@ const formatTaskList = (tasks: SharedTask[]): string => {
 const formatSectionChoices = (sections: SharedSection[]): string =>
   sections.map((section, index) => `${index + 1}. ${section.name}`).join("\n");
 
+const findSectionById = (sections: SharedSection[], sectionId: string): SharedSection | null =>
+  sections.find((section) => section.id === sectionId) ?? null;
+
+const findSectionFromInput = (
+  sections: SharedSection[],
+  input: string,
+): SharedSection | null => {
+  const sectionByIndex = parsePositiveIndex(input);
+
+  return (
+    (sectionByIndex !== null ? sections[sectionByIndex - 1] : null) ??
+    sections.find((section) => section.name === input) ??
+    null
+  );
+};
+
 const resolveTaskId = (
   listStateStore: ListStateStoreLike,
   scopeKey: string,
@@ -112,9 +130,12 @@ const resolveTaskId = (
 export const showTaskList = async ({
   gateway,
   listStateStore,
-  scopeKey
-}: Pick<HandleCommandOptions, "gateway" | "listStateStore" | "scopeKey">): Promise<string> => {
-  const tasks = await gateway.listActiveTasks();
+  scopeKey,
+  sectionId
+}: Pick<HandleCommandOptions, "gateway" | "listStateStore" | "scopeKey"> & {
+  sectionId?: string;
+}): Promise<string> => {
+  const tasks = await gateway.listActiveTasks(sectionId);
   listStateStore.save(
     scopeKey,
     tasks.map((task) => task.id),
@@ -122,54 +143,148 @@ export const showTaskList = async ({
   return formatTaskList(tasks);
 };
 
+export const startListConversation = async ({
+  gateway,
+  conversationStateStore,
+  scopeKey
+}: StartAddConversationOptions): Promise<string> => {
+  conversationStateStore.save(scopeKey, {
+    type: "awaiting-list-section"
+  });
+
+  return `どのセクションを表示する？\n${formatSectionChoices(gateway.listSections())}`;
+};
+
 export const startEditConversation = async ({
   gateway,
   conversationStateStore,
-  listStateStore,
   scopeKey
-}: StartEditConversationOptions): Promise<string> =>
-  startNumberedConversation({
-    gateway,
-    conversationStateStore,
-    listStateStore,
-    scopeKey,
-    prompt: "編集したい番号を送って",
-    state: {
-      type: "awaiting-edit-index"
-    }
+}: StartAddConversationOptions): Promise<string> => {
+  conversationStateStore.save(scopeKey, {
+    type: "awaiting-edit-section"
   });
+
+  return `どのセクションを編集する？\n${formatSectionChoices(gateway.listSections())}`;
+};
 
 export const startCompleteConversation = async ({
   gateway,
   conversationStateStore,
-  listStateStore,
   scopeKey
-}: StartEditConversationOptions): Promise<string> =>
-  startNumberedConversation({
-    gateway,
-    conversationStateStore,
-    listStateStore,
-    scopeKey,
-    prompt: "完了したい番号を送って",
-    state: {
-      type: "awaiting-complete-index"
-    }
+}: StartAddConversationOptions): Promise<string> => {
+  conversationStateStore.save(scopeKey, {
+    type: "awaiting-complete-section"
   });
+
+  return `どのセクションを完了する？\n${formatSectionChoices(gateway.listSections())}`;
+};
 
 export const startDeleteConversation = async ({
   gateway,
   conversationStateStore,
-  listStateStore,
   scopeKey
-}: StartEditConversationOptions): Promise<string> =>
+}: StartAddConversationOptions): Promise<string> => {
+  conversationStateStore.save(scopeKey, {
+    type: "awaiting-delete-section"
+  });
+
+  return `どのセクションを削除する？\n${formatSectionChoices(gateway.listSections())}`;
+};
+
+export const showTaskListBySection = async ({
+  gateway,
+  conversationStateStore,
+  listStateStore,
+  scopeKey,
+  sectionId
+}: ContinueSectionConversationOptions): Promise<string> => {
+  conversationStateStore.clear(scopeKey);
+  return showTaskList({
+    gateway,
+    listStateStore,
+    scopeKey,
+    sectionId
+  });
+};
+
+export const continueAddConversationWithSection = async ({
+  gateway,
+  conversationStateStore,
+  sectionId,
+  scopeKey
+}: Omit<ContinueSectionConversationOptions, "listStateStore">): Promise<string> => {
+  const section = findSectionById(gateway.listSections(), sectionId);
+
+  if (!section) {
+    conversationStateStore.clear(scopeKey);
+    return "セクションが見つからないよ";
+  }
+
+  conversationStateStore.save(scopeKey, {
+    type: "awaiting-add-content",
+    sectionId: section.id
+  });
+
+  return `${section.name} に追加したいタスク名を送って`;
+};
+
+export const continueEditConversationWithSection = async ({
+  gateway,
+  conversationStateStore,
+  listStateStore,
+  scopeKey,
+  sectionId
+}: ContinueSectionConversationOptions): Promise<string> =>
   startNumberedConversation({
     gateway,
     conversationStateStore,
     listStateStore,
     scopeKey,
+    sectionId,
+    prompt: "編集したい番号を送って",
+    state: {
+      type: "awaiting-edit-index",
+      sectionId
+    }
+  });
+
+export const continueCompleteConversationWithSection = async ({
+  gateway,
+  conversationStateStore,
+  listStateStore,
+  scopeKey,
+  sectionId
+}: ContinueSectionConversationOptions): Promise<string> =>
+  startNumberedConversation({
+    gateway,
+    conversationStateStore,
+    listStateStore,
+    scopeKey,
+    sectionId,
+    prompt: "完了したい番号を送って",
+    state: {
+      type: "awaiting-complete-index",
+      sectionId
+    }
+  });
+
+export const continueDeleteConversationWithSection = async ({
+  gateway,
+  conversationStateStore,
+  listStateStore,
+  scopeKey,
+  sectionId
+}: ContinueSectionConversationOptions): Promise<string> =>
+  startNumberedConversation({
+    gateway,
+    conversationStateStore,
+    listStateStore,
+    scopeKey,
+    sectionId,
     prompt: "削除したい番号を送って",
     state: {
-      type: "awaiting-delete-index"
+      type: "awaiting-delete-index",
+      sectionId
     }
   });
 
@@ -178,14 +293,17 @@ const startNumberedConversation = async ({
   conversationStateStore,
   listStateStore,
   scopeKey,
+  sectionId,
   prompt,
   state
 }: StartNumberedConversationOptions): Promise<string> => {
-  const tasks = await gateway.listActiveTasks();
+  const tasks = await gateway.listActiveTasks(sectionId);
+  const section = findSectionById(gateway.listSections(), sectionId);
+  const sectionName = section?.name ?? "このセクション";
 
   if (tasks.length === 0) {
     conversationStateStore.clear(scopeKey);
-    return "いまは共有 TODO は空だよ";
+    return `${sectionName} の共有 TODO は空だよ`;
   }
 
   listStateStore.save(
@@ -196,7 +314,7 @@ const startNumberedConversation = async ({
     ...state
   });
 
-  return `${formatTaskList(tasks)}\n\n${prompt}`;
+  return `${formatTaskList(tasks)}\n\n${sectionName} で${prompt}`;
 };
 
 export const startAddConversation = async ({
@@ -245,20 +363,35 @@ export const handleConversationText = async ({
   switch (state.type) {
     case "awaiting-add-section": {
       const sections = gateway.listSections();
-      const sectionByIndex = parsePositiveIndex(trimmed);
-      const selectedSection =
-        (sectionByIndex !== null ? sections[sectionByIndex - 1] : null) ??
-        sections.find((section) => section.name === trimmed);
+      const selectedSection = findSectionFromInput(sections, trimmed);
 
       if (!selectedSection) {
         return `番号かセクション名を送ってね\n${formatSectionChoices(sections)}`;
       }
 
-      conversationStateStore.save(scopeKey, {
-        type: "awaiting-add-content",
+      return continueAddConversationWithSection({
+        gateway,
+        conversationStateStore,
+        scopeKey,
         sectionId: selectedSection.id
       });
-      return `${selectedSection.name} に追加したいタスク名を送って`;
+    }
+
+    case "awaiting-list-section": {
+      const sections = gateway.listSections();
+      const selectedSection = findSectionFromInput(sections, trimmed);
+
+      if (!selectedSection) {
+        return `番号かセクション名を送ってね\n${formatSectionChoices(sections)}`;
+      }
+
+      return showTaskListBySection({
+        gateway,
+        conversationStateStore,
+        listStateStore,
+        scopeKey,
+        sectionId: selectedSection.id
+      });
     }
 
     case "awaiting-add-content": {
@@ -270,6 +403,22 @@ export const handleConversationText = async ({
       conversationStateStore.clear(scopeKey);
       const sectionLabel = task.sectionName ? ` [${task.sectionName}]` : "";
       return `追加したよ${sectionLabel}: ${task.content}`;
+    }
+
+    case "awaiting-edit-section": {
+      const selectedSection = findSectionFromInput(gateway.listSections(), trimmed);
+
+      if (!selectedSection) {
+        return `番号かセクション名を送ってね\n${formatSectionChoices(gateway.listSections())}`;
+      }
+
+      return continueEditConversationWithSection({
+        gateway,
+        conversationStateStore,
+        listStateStore,
+        scopeKey,
+        sectionId: selectedSection.id
+      });
     }
 
     case "awaiting-edit-index": {
@@ -287,9 +436,26 @@ export const handleConversationText = async ({
 
       conversationStateStore.save(scopeKey, {
         type: "awaiting-edit-content",
-        taskId
+        taskId,
+        sectionId: state.sectionId
       });
       return "新しい内容を送って";
+    }
+
+    case "awaiting-complete-section": {
+      const selectedSection = findSectionFromInput(gateway.listSections(), trimmed);
+
+      if (!selectedSection) {
+        return `番号かセクション名を送ってね\n${formatSectionChoices(gateway.listSections())}`;
+      }
+
+      return continueCompleteConversationWithSection({
+        gateway,
+        conversationStateStore,
+        listStateStore,
+        scopeKey,
+        sectionId: selectedSection.id
+      });
     }
 
     case "awaiting-complete-index": {
@@ -309,6 +475,22 @@ export const handleConversationText = async ({
       conversationStateStore.clear(scopeKey);
       listStateStore.clear(scopeKey);
       return `完了したよ: ${task.content}`;
+    }
+
+    case "awaiting-delete-section": {
+      const selectedSection = findSectionFromInput(gateway.listSections(), trimmed);
+
+      if (!selectedSection) {
+        return `番号かセクション名を送ってね\n${formatSectionChoices(gateway.listSections())}`;
+      }
+
+      return continueDeleteConversationWithSection({
+        gateway,
+        conversationStateStore,
+        listStateStore,
+        scopeKey,
+        sectionId: selectedSection.id
+      });
     }
 
     case "awaiting-delete-index": {

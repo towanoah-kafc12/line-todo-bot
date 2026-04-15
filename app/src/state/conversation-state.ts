@@ -1,10 +1,14 @@
 export type ConversationState =
+  | { type: "awaiting-list-section" }
   | { type: "awaiting-add-section" }
   | { type: "awaiting-add-content"; sectionId: string }
-  | { type: "awaiting-edit-index" }
-  | { type: "awaiting-edit-content"; taskId: string }
-  | { type: "awaiting-complete-index" }
-  | { type: "awaiting-delete-index" };
+  | { type: "awaiting-edit-section" }
+  | { type: "awaiting-edit-index"; sectionId: string }
+  | { type: "awaiting-edit-content"; taskId: string; sectionId: string }
+  | { type: "awaiting-complete-section" }
+  | { type: "awaiting-complete-index"; sectionId: string }
+  | { type: "awaiting-delete-section" }
+  | { type: "awaiting-delete-index"; sectionId: string };
 
 type StoredConversationState = {
   expiresAt: number;

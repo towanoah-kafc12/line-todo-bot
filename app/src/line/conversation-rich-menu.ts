@@ -2,6 +2,7 @@ import type { ConversationState } from "../state/conversation-state.js";
 
 export const conversationRichMenuAliases = {
   main: "todo-main",
+  list: "todo-list",
   add: "todo-add",
   edit: "todo-edit",
   complete: "todo-complete",
@@ -48,14 +49,19 @@ const resolveAliasFromState = (state: ConversationState | null): RichMenuAliasId
   }
 
   switch (state.type) {
+    case "awaiting-list-section":
+      return conversationRichMenuAliases.list;
     case "awaiting-add-section":
     case "awaiting-add-content":
       return conversationRichMenuAliases.add;
+    case "awaiting-edit-section":
     case "awaiting-edit-index":
     case "awaiting-edit-content":
       return conversationRichMenuAliases.edit;
+    case "awaiting-complete-section":
     case "awaiting-complete-index":
       return conversationRichMenuAliases.complete;
+    case "awaiting-delete-section":
     case "awaiting-delete-index":
       return conversationRichMenuAliases.delete;
   }

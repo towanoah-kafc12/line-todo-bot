@@ -39,7 +39,7 @@ export class TodoistGateway {
     this.requestIdFactory = requestIdFactory;
   }
 
-  async listActiveTasks(): Promise<Task[]> {
+  async listActiveTasks(sectionId?: string): Promise<Task[]> {
     const response = await this.client.getTasks({
       projectId: this.projectId
     });
@@ -48,6 +48,7 @@ export class TodoistGateway {
       .filter(
         (task) =>
           isSharedTask(task, this.projectId, this.sectionIds) &&
+          (sectionId ? task.sectionId === sectionId : true) &&
           !task.checked &&
           !task.isDeleted,
       )

@@ -3,6 +3,24 @@ import { describe, expect, it, vi } from "vitest";
 import { createConversationRichMenuManager } from "../src/line/conversation-rich-menu.js";
 
 describe("conversation rich menu manager", () => {
+  it("links the list menu while section selection is active", async () => {
+    const client = {
+      getRichMenuAlias: vi.fn().mockResolvedValue({
+        richMenuId: "richmenu-list"
+      }),
+      linkRichMenuIdToUser: vi.fn().mockResolvedValue(undefined),
+      unlinkRichMenuIdFromUser: vi.fn().mockResolvedValue(undefined)
+    };
+    const manager = createConversationRichMenuManager(client);
+
+    await manager.sync("U1", {
+      type: "awaiting-list-section"
+    });
+
+    expect(client.getRichMenuAlias).toHaveBeenCalledWith("todo-list");
+    expect(client.linkRichMenuIdToUser).toHaveBeenCalledWith("U1", "richmenu-list");
+  });
+
   it("links the add menu while add conversation is active", async () => {
     const client = {
       getRichMenuAlias: vi.fn().mockResolvedValue({

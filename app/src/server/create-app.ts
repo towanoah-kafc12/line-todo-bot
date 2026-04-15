@@ -2,9 +2,15 @@ import { Hono } from "hono";
 
 import type { AppConfig } from "../config/env.js";
 import {
+  continueAddConversationWithSection,
+  continueCompleteConversationWithSection,
+  continueDeleteConversationWithSection,
+  continueEditConversationWithSection,
   handleCommand,
   handleConversationText,
   showTaskList,
+  showTaskListBySection,
+  startListConversation,
   startAddConversation,
   startCompleteConversation,
   startDeleteConversation,
@@ -35,6 +41,53 @@ type CreateAppDependencies = {
 
 type ReplyableEvent = Extract<EventEvaluation, { status: "accepted" | "rejected" }> & {
   replyToken: string;
+};
+
+type MenuPostback =
+  | { kind: "menu"; menu: "list" | "add" | "edit" | "complete" | "delete" | "list-preview" | "list-all" }
+  | { kind: "section"; menu: "list" | "add" | "edit" | "complete" | "delete"; sectionId: string }
+  | null;
+
+const parseMenuPostback = (data: string): MenuPostback => {
+  if (data === "menu=list") {
+    return { kind: "menu", menu: "list" };
+  }
+
+  if (data === "menu=add") {
+    return { kind: "menu", menu: "add" };
+  }
+
+  if (data === "menu=edit") {
+    return { kind: "menu", menu: "edit" };
+  }
+
+  if (data === "menu=complete") {
+    return { kind: "menu", menu: "complete" };
+  }
+
+  if (data === "menu=delete") {
+    return { kind: "menu", menu: "delete" };
+  }
+
+  if (data === "menu=list-preview") {
+    return { kind: "menu", menu: "list-preview" };
+  }
+
+  if (data === "menu=list:all") {
+    return { kind: "menu", menu: "list-all" };
+  }
+
+  const sectionMatch = data.match(/^menu=(list|add|edit|complete|delete):section:(.+)$/);
+
+  if (!sectionMatch) {
+    return null;
+  }
+
+  return {
+    kind: "section",
+    menu: sectionMatch[1] as "list" | "add" | "edit" | "complete" | "delete",
+    sectionId: sectionMatch[2]
+  };
 };
 
 export const createApp = (config: AppConfig, dependencies: CreateAppDependencies = {}): Hono => {
@@ -82,40 +135,97 @@ export const createApp = (config: AppConfig, dependencies: CreateAppDependencies
       channelSecret: config.line.channelSecret,
       handleAuthorizedEvent: async ({ event, scopeKey, userId }) => {
         let replyMessage: string | { ok: false; errorMessage: string } | null;
+        const currentConversationState = conversationStateStore.load(scopeKey);
 
         if (event.type === "postback") {
-          if (event.data === "menu=add") {
+          const parsedPostback = parseMenuPostback(event.data);
+
+          if (parsedPostback?.kind === "menu" && parsedPostback.menu === "list") {
+            replyMessage = await startListConversation({
+              gateway: todoistGateway,
+              conversationStateStore,
+              scopeKey
+            });
+          } else if (parsedPostback?.kind === "menu" && parsedPostback.menu === "add") {
             replyMessage = await startAddConversation({
               gateway: todoistGateway,
               conversationStateStore,
               scopeKey
             });
-          } else if (event.data === "menu=complete") {
+          } else if (parsedPostback?.kind === "menu" && parsedPostback.menu === "complete") {
             replyMessage = await startCompleteConversation({
               gateway: todoistGateway,
               conversationStateStore,
-              listStateStore,
               scopeKey
             });
-          } else if (event.data === "menu=delete") {
+          } else if (parsedPostback?.kind === "menu" && parsedPostback.menu === "delete") {
             replyMessage = await startDeleteConversation({
               gateway: todoistGateway,
               conversationStateStore,
-              listStateStore,
               scopeKey
             });
-          } else if (event.data === "menu=edit") {
+          } else if (parsedPostback?.kind === "menu" && parsedPostback.menu === "edit") {
             replyMessage = await startEditConversation({
               gateway: todoistGateway,
               conversationStateStore,
-              listStateStore,
               scopeKey
             });
-          } else if (event.data === "menu=list-preview") {
+          } else if (parsedPostback?.kind === "menu" && parsedPostback.menu === "list-preview") {
+            replyMessage = await showTaskList({
+              gateway: todoistGateway,
+              listStateStore,
+              scopeKey,
+              sectionId:
+                currentConversationState &&
+                "sectionId" in currentConversationState
+                  ? currentConversationState.sectionId
+                  : undefined
+            });
+          } else if (parsedPostback?.kind === "menu" && parsedPostback.menu === "list-all") {
+            conversationStateStore.clear(scopeKey);
             replyMessage = await showTaskList({
               gateway: todoistGateway,
               listStateStore,
               scopeKey
+            });
+          } else if (parsedPostback?.kind === "section" && parsedPostback.menu === "list") {
+            replyMessage = await showTaskListBySection({
+              gateway: todoistGateway,
+              conversationStateStore,
+              listStateStore,
+              scopeKey,
+              sectionId: parsedPostback.sectionId
+            });
+          } else if (parsedPostback?.kind === "section" && parsedPostback.menu === "add") {
+            replyMessage = await continueAddConversationWithSection({
+              gateway: todoistGateway,
+              conversationStateStore,
+              scopeKey,
+              sectionId: parsedPostback.sectionId
+            });
+          } else if (parsedPostback?.kind === "section" && parsedPostback.menu === "edit") {
+            replyMessage = await continueEditConversationWithSection({
+              gateway: todoistGateway,
+              conversationStateStore,
+              listStateStore,
+              scopeKey,
+              sectionId: parsedPostback.sectionId
+            });
+          } else if (parsedPostback?.kind === "section" && parsedPostback.menu === "complete") {
+            replyMessage = await continueCompleteConversationWithSection({
+              gateway: todoistGateway,
+              conversationStateStore,
+              listStateStore,
+              scopeKey,
+              sectionId: parsedPostback.sectionId
+            });
+          } else if (parsedPostback?.kind === "section" && parsedPostback.menu === "delete") {
+            replyMessage = await continueDeleteConversationWithSection({
+              gateway: todoistGateway,
+              conversationStateStore,
+              listStateStore,
+              scopeKey,
+              sectionId: parsedPostback.sectionId
             });
           } else {
             replyMessage = null;

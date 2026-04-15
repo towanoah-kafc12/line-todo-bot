@@ -23,6 +23,12 @@ const richMenus = [
     imagePath: path.join(repositoryRoot, "assets", "line", "add-rich-menu.png")
   },
   {
+    key: "list",
+    aliasId: "todo-list",
+    definitionPath: path.join(repositoryRoot, "assets", "line", "list-rich-menu.json"),
+    imagePath: path.join(repositoryRoot, "assets", "line", "list-rich-menu.png")
+  },
+  {
     key: "edit",
     aliasId: "todo-edit",
     definitionPath: path.join(repositoryRoot, "assets", "line", "edit-rich-menu.json"),

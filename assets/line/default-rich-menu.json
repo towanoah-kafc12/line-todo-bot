@@ -15,9 +15,10 @@
         "height": 720
       },
       "action": {
-        "type": "message",
-        "label": "一覧を見る",
-        "text": "みる"
+        "type": "postback",
+        "label": "表示する",
+        "data": "menu=list",
+        "displayText": "表示する"
       }
     },
     {

@@ -4,8 +4,8 @@
     "height": 1686
   },
   "selected": false,
-  "name": "state-edit-menu",
-  "chatBarText": "編集中",
+  "name": "state-list-menu",
+  "chatBarText": "表示中",
   "areas": [
     {
       "bounds": {
@@ -17,8 +17,8 @@
       "action": {
         "type": "postback",
         "label": "買うもの",
-        "data": "menu=edit:section:2345678901",
-        "displayText": "買うものを編集する"
+        "data": "menu=list:section:2345678901",
+        "displayText": "買うものを表示する"
       }
     },
     {
@@ -31,8 +31,8 @@
       "action": {
         "type": "postback",
         "label": "やること",
-        "data": "menu=edit:section:3456789012",
-        "displayText": "やることを編集する"
+        "data": "menu=list:section:3456789012",
+        "displayText": "やることを表示する"
       }
     },
     {
@@ -57,9 +57,9 @@
       },
       "action": {
         "type": "postback",
-        "label": "一覧を見る",
-        "data": "menu=list-preview",
-        "displayText": "一覧を見直す"
+        "label": "全部見る",
+        "data": "menu=list:all",
+        "displayText": "全部表示する"
       }
     }
   ]

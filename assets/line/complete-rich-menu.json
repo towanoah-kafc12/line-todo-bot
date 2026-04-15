@@ -10,9 +10,37 @@
     {
       "bounds": {
         "x": 0,
-        "y": 1080,
+        "y": 0,
         "width": 1250,
-        "height": 606
+        "height": 843
+      },
+      "action": {
+        "type": "postback",
+        "label": "買うもの",
+        "data": "menu=complete:section:2345678901",
+        "displayText": "買うものを完了する"
+      }
+    },
+    {
+      "bounds": {
+        "x": 1250,
+        "y": 0,
+        "width": 1250,
+        "height": 843
+      },
+      "action": {
+        "type": "postback",
+        "label": "やること",
+        "data": "menu=complete:section:3456789012",
+        "displayText": "やることを完了する"
+      }
+    },
+    {
+      "bounds": {
+        "x": 0,
+        "y": 843,
+        "width": 1250,
+        "height": 843
       },
       "action": {
         "type": "message",
@@ -23,9 +51,9 @@
     {
       "bounds": {
         "x": 1250,
-        "y": 1080,
+        "y": 843,
         "width": 1250,
-        "height": 606
+        "height": 843
       },
       "action": {
         "type": "postback",
