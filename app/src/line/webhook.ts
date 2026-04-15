@@ -1,15 +1,25 @@
 import { validateSignature, type webhook } from "@line/bot-sdk";
 
-import { parseCommand, type ParseResult } from "../commands/parser.js";
 import { isAuthorizedUserId } from "./authorization.js";
+
+type AuthorizedTextEvent = {
+  type: "text";
+  text: string;
+};
+
+type AuthorizedPostbackEvent = {
+  type: "postback";
+  data: string;
+};
 
 type WebhookContext = {
   allowedUserIds: string[];
   channelSecret: string;
-  handleAcceptedCommand?: (input: {
-    command: ParseResult & { ok: true };
+  handleAuthorizedEvent?: (input: {
+    event: AuthorizedTextEvent | AuthorizedPostbackEvent;
+    scopeKey: string;
     userId: string;
-  }) => Promise<string>;
+  }) => Promise<string | { ok: false; errorMessage: string } | null>;
   rawBody: string;
   signature: string | undefined;
 };
@@ -19,7 +29,6 @@ export type EventEvaluation =
       status: "accepted";
       replyToken?: string;
       userId: string;
-      command: ParseResult & { ok: true };
       replyMessage: string;
     }
   | {
@@ -52,14 +61,28 @@ type TextMessageEvent = webhook.MessageEvent & {
 const isTextMessageEvent = (event: webhook.Event): event is TextMessageEvent =>
   "message" in event && event.type === "message" && event.message.type === "text";
 
+const isPostbackEvent = (event: webhook.Event): event is webhook.PostbackEvent =>
+  event.type === "postback";
+
+const createScopeKey = (source: webhook.Source, userId: string): string => {
+  switch (source.type) {
+    case "user":
+      return `user:${userId}`;
+    case "group":
+      return `group:${source.groupId}:user:${userId}`;
+    case "room":
+      return `room:${source.roomId}:user:${userId}`;
+  }
+};
+
 const evaluateEvent = (
   {
     allowedUserIds,
-    handleAcceptedCommand
-  }: Pick<WebhookContext, "allowedUserIds" | "handleAcceptedCommand">,
+    handleAuthorizedEvent
+  }: Pick<WebhookContext, "allowedUserIds" | "handleAuthorizedEvent">,
   event: webhook.Event,
 ): Promise<EventEvaluation> => {
-  if (!isTextMessageEvent(event)) {
+  if (!isTextMessageEvent(event) && !isPostbackEvent(event)) {
     if ("message" in event) {
       return Promise.resolve({
         status: "ignored",
@@ -73,10 +96,11 @@ const evaluateEvent = (
     });
   }
 
-  const userId = event.source?.userId;
+  const source = event.source;
+  const userId = source?.userId;
   const replyToken = event.replyToken;
 
-  if (!userId || !isAuthorizedUserId(allowedUserIds, userId)) {
+  if (!source || !userId || !isAuthorizedUserId(allowedUserIds, userId)) {
     return Promise.resolve({
       status: "rejected",
       reason: "unauthorized-user",
@@ -85,31 +109,47 @@ const evaluateEvent = (
       errorMessage: "この操作は許可されていないよ"
     });
   }
-
-  const command = parseCommand(event.message.text);
-
-  if (!command.ok) {
-    return Promise.resolve({
-      status: "rejected",
-      reason: "unsupported-command",
-      replyToken,
-      userId,
-      errorMessage: command.errorMessage
-    });
-  }
+  const scopeKey = createScopeKey(source, userId);
 
   return Promise.resolve(
-    handleAcceptedCommand?.({
-      command,
+    handleAuthorizedEvent?.({
+      event: isTextMessageEvent(event)
+        ? {
+            type: "text",
+            text: event.message.text
+          }
+        : {
+            type: "postback",
+            data: event.postback.data
+          },
+      scopeKey,
       userId
     }) ?? "accepted",
-  ).then((replyMessage) => ({
-    status: "accepted",
-    replyToken,
-    userId,
-    command,
-    replyMessage
-  }));
+  ).then((result) => {
+    if (result === null) {
+      return {
+        status: "ignored" as const,
+        reason: "unsupported-event" as const
+      };
+    }
+
+    if (typeof result !== "string" && result.ok === false) {
+      return {
+        status: "rejected" as const,
+        reason: "unsupported-command" as const,
+        replyToken,
+        userId,
+        errorMessage: result.errorMessage
+      };
+    }
+
+    return {
+      status: "accepted" as const,
+      replyToken,
+      userId,
+      replyMessage: typeof result === "string" ? result : "accepted"
+    };
+  });
 };
 
 const parseCallbackRequest = (rawBody: string): webhook.CallbackRequest => {
@@ -123,7 +163,7 @@ const parseCallbackRequest = (rawBody: string): webhook.CallbackRequest => {
 export const handleWebhookRequest = async ({
   allowedUserIds,
   channelSecret,
-  handleAcceptedCommand,
+  handleAuthorizedEvent,
   rawBody,
   signature
 }: WebhookContext): Promise<WebhookHandlingResult> => {
@@ -162,7 +202,7 @@ export const handleWebhookRequest = async ({
         evaluateEvent(
           {
             allowedUserIds,
-            handleAcceptedCommand
+            handleAuthorizedEvent
           },
           event,
         ),

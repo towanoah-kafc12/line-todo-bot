@@ -47,8 +47,7 @@ describe("default rich menu definition", () => {
             type: "postback",
             label: "追加する",
             data: "menu=add",
-            inputOption: "openKeyboard",
-            fillInText: "追加 "
+            displayText: "タスクを追加する"
           }
         },
         {
@@ -77,8 +76,7 @@ describe("default rich menu definition", () => {
             type: "postback",
             label: "編集する",
             data: "menu=edit",
-            inputOption: "openKeyboard",
-            fillInText: "編集 "
+            displayText: "タスクを編集する"
           }
         },
         {

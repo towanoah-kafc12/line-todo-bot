@@ -248,8 +248,11 @@ npx wrangler tunnel quick-start http://localhost:3000
 ### 2. Apply the default rich menu
 
 この repo には、主要コマンドへ誘導する default rich menu 定義と画像を置いてある。
-`一覧を見る` は `message action` で `みる` を即送信し、`追加する` `完了する` `編集する` `削除する` は `postback action` でキーボードを開いてコマンド文字列を事前入力する。
-理由は、可変入力がある操作でも既存のテキストコマンド設計を崩さずに使えるからだよ。
+`一覧を見る` は `message action` で `みる` を即送信する。
+`完了する` `削除する` は `postback action` でキーボードを開いてコマンド文字列を事前入力する。
+`追加する` は `postback action` でタイトル入力待ちを始める。
+`編集する` は `postback action` で一覧表示と番号入力待ちを始める。
+理由は、追加と編集は会話型の方が自然で、入力ミスや番号確認漏れを減らせるからだよ。
 
 実行コマンド:
 
@@ -276,7 +279,9 @@ npm run rich-menu:delete -- <richMenuId>
 - スマホ版 LINE の個人チャットで rich menu が見える
 - グループでも rich menu が見える
 - `一覧を見る` を押すと `みる` が送られる
-- `追加する` `完了する` `編集する` `削除する` を押すと、入力欄に対応するコマンドが補完される
+- `追加する` を押すと `追加したいタスク名を送って` が返る
+- `完了する` `削除する` を押すと、入力欄に対応するコマンドが補完される
+- `編集する` を押すと、一覧と `編集したい番号を送って` が返る
 - Bot が Reply API で一覧を返す
 
 ## Common Failure Points

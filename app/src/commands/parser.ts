@@ -9,7 +9,7 @@ export type ParseResult =
   | { ok: true; command: ParsedCommand }
   | { ok: false; errorMessage: string };
 
-const parsePositiveIndex = (value: string): number | null => {
+export const parsePositiveIndex = (value: string): number | null => {
   if (!/^\d+$/.test(value)) {
     return null;
   }

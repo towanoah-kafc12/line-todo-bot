@@ -25,10 +25,10 @@ describe("handleCommand", () => {
         command: { type: "list" },
         gateway,
         listStateStore,
-        userId: "U1"
+        scopeKey: "user:U1"
       }),
     ).resolves.toBe("1. 牛乳を買う\n2. ゴミを出す");
-    expect(listStateStore.save).toHaveBeenCalledWith("U1", ["task-1", "task-2"]);
+    expect(listStateStore.save).toHaveBeenCalledWith("user:U1", ["task-1", "task-2"]);
   });
 
   it("returns an add success message", async () => {
@@ -50,7 +50,7 @@ describe("handleCommand", () => {
         command: { type: "add", content: "洗剤を買う" },
         gateway,
         listStateStore,
-        userId: "U1"
+        scopeKey: "user:U1"
       }),
     ).resolves.toBe("追加したよ: 洗剤を買う");
   });
@@ -74,7 +74,7 @@ describe("handleCommand", () => {
         command: { type: "complete", index: 2 },
         gateway,
         listStateStore,
-        userId: "U1"
+        scopeKey: "user:U1"
       }),
     ).resolves.toBe("完了したよ: 洗剤を補充");
 
@@ -83,7 +83,7 @@ describe("handleCommand", () => {
         command: { type: "delete", index: 2 },
         gateway,
         listStateStore,
-        userId: "U1"
+        scopeKey: "user:U1"
       }),
     ).resolves.toBe("削除したよ: 洗剤を補充");
 
@@ -92,7 +92,7 @@ describe("handleCommand", () => {
         command: { type: "edit", index: 2, content: "洗剤を補充" },
         gateway,
         listStateStore,
-        userId: "U1"
+        scopeKey: "user:U1"
       }),
     ).resolves.toBe("更新したよ: 洗剤を補充");
   });
@@ -116,7 +116,7 @@ describe("handleCommand", () => {
         command: { type: "complete", index: 9 },
         gateway,
         listStateStore,
-        userId: "U1"
+        scopeKey: "user:U1"
       }),
     ).resolves.toBe("番号が見つからないよ");
   });

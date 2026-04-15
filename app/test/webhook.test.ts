@@ -106,13 +106,7 @@ describe("POST /webhook", () => {
         {
           status: "accepted",
           userId: "U-allowed",
-          replyMessage: "1. 牛乳を買う\n2. ゴミを出す",
-          command: {
-            ok: true,
-            command: {
-              type: "list"
-            }
-          }
+          replyMessage: "1. 牛乳を買う\n2. ゴミを出す"
         }
       ]
     });
@@ -253,5 +247,343 @@ describe("POST /webhook", () => {
       ok: false,
       errorMessage: "Failed to send LINE reply"
     });
+  });
+
+  it("starts and completes edit conversation from rich menu postback", async () => {
+    const todoistGateway = {
+      listActiveTasks: vi.fn().mockResolvedValue([
+        { id: "task-1", content: "牛乳を買う" },
+        { id: "task-2", content: "ゴミを出す" }
+      ]),
+      addTask: vi.fn(),
+      updateTask: vi.fn().mockResolvedValue({
+        id: "task-2",
+        content: "燃えるゴミを出す"
+      }),
+      completeTask: vi.fn(),
+      deleteTask: vi.fn()
+    };
+    const listStateStore = {
+      save: vi.fn(),
+      resolve: vi.fn().mockReturnValue("task-2"),
+      clear: vi.fn()
+    };
+    const conversationStateStore = {
+      save: vi.fn(),
+      load: vi
+        .fn()
+        .mockReturnValueOnce(null)
+        .mockReturnValueOnce({ type: "awaiting-edit-index" })
+        .mockReturnValueOnce({ type: "awaiting-edit-content", taskId: "task-2" }),
+      clear: vi.fn()
+    };
+    const messagingClient = {
+      replyMessage: vi.fn().mockResolvedValue({})
+    };
+    const app = createApp(config, {
+      todoistGateway,
+      listStateStore,
+      conversationStateStore,
+      messagingClient
+    });
+
+    const postbackBody = JSON.stringify({
+      destination: "Ubot",
+      events: [
+        {
+          type: "postback",
+          replyToken: "reply-token-1",
+          timestamp: 1712900000000,
+          source: {
+            type: "user",
+            userId: "U-allowed"
+          },
+          postback: {
+            data: "menu=edit"
+          }
+        }
+      ]
+    });
+    const indexBody = JSON.stringify({
+      destination: "Ubot",
+      events: [
+        {
+          type: "message",
+          replyToken: "reply-token-2",
+          timestamp: 1712900000001,
+          source: {
+            type: "user",
+            userId: "U-allowed"
+          },
+          message: {
+            id: "2",
+            type: "text",
+            text: "2"
+          }
+        }
+      ]
+    });
+    const contentBody = JSON.stringify({
+      destination: "Ubot",
+      events: [
+        {
+          type: "message",
+          replyToken: "reply-token-3",
+          timestamp: 1712900000002,
+          source: {
+            type: "user",
+            userId: "U-allowed"
+          },
+          message: {
+            id: "3",
+            type: "text",
+            text: "燃えるゴミを出す"
+          }
+        }
+      ]
+    });
+
+    const postbackResponse = await app.request("/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-line-signature": createSignature(postbackBody)
+      },
+      body: postbackBody
+    });
+    const indexResponse = await app.request("/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-line-signature": createSignature(indexBody)
+      },
+      body: indexBody
+    });
+    const contentResponse = await app.request("/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-line-signature": createSignature(contentBody)
+      },
+      body: contentBody
+    });
+
+    expect(postbackResponse.status).toBe(200);
+    await expect(postbackResponse.json()).resolves.toMatchObject({
+      ok: true,
+      acceptedEvents: 1,
+      repliedEvents: 1,
+      events: [
+        {
+          status: "accepted",
+          userId: "U-allowed",
+          replyMessage: "1. 牛乳を買う\n2. ゴミを出す\n\n編集したい番号を送って"
+        }
+      ]
+    });
+    expect(indexResponse.status).toBe(200);
+    await expect(indexResponse.json()).resolves.toMatchObject({
+      ok: true,
+      acceptedEvents: 1,
+      repliedEvents: 1,
+      events: [
+        {
+          status: "accepted",
+          userId: "U-allowed",
+          replyMessage: "新しい内容を送って"
+        }
+      ]
+    });
+    expect(contentResponse.status).toBe(200);
+    await expect(contentResponse.json()).resolves.toMatchObject({
+      ok: true,
+      acceptedEvents: 1,
+      repliedEvents: 1,
+      events: [
+        {
+          status: "accepted",
+          userId: "U-allowed",
+          replyMessage: "更新したよ: 燃えるゴミを出す"
+        }
+      ]
+    });
+    expect(listStateStore.save).toHaveBeenCalledWith("user:U-allowed", ["task-1", "task-2"]);
+    expect(conversationStateStore.save).toHaveBeenCalledWith("user:U-allowed", {
+      type: "awaiting-edit-index"
+    });
+    expect(conversationStateStore.save).toHaveBeenCalledWith("user:U-allowed", {
+      type: "awaiting-edit-content",
+      taskId: "task-2"
+    });
+    expect(todoistGateway.updateTask).toHaveBeenCalledWith("task-2", "燃えるゴミを出す");
+    expect(conversationStateStore.clear).toHaveBeenCalledWith("user:U-allowed");
+  });
+
+  it("starts and completes add conversation from rich menu postback", async () => {
+    const todoistGateway = {
+      listActiveTasks: vi.fn(),
+      addTask: vi.fn().mockResolvedValue({
+        id: "task-3",
+        content: "洗剤を買う"
+      }),
+      updateTask: vi.fn(),
+      completeTask: vi.fn(),
+      deleteTask: vi.fn()
+    };
+    const listStateStore = {
+      save: vi.fn(),
+      resolve: vi.fn(),
+      clear: vi.fn()
+    };
+    const conversationStateStore = {
+      save: vi.fn(),
+      load: vi
+        .fn()
+        .mockReturnValueOnce(null)
+        .mockReturnValueOnce({ type: "awaiting-add-content" }),
+      clear: vi.fn()
+    };
+    const messagingClient = {
+      replyMessage: vi.fn().mockResolvedValue({})
+    };
+    const app = createApp(config, {
+      todoistGateway,
+      listStateStore,
+      conversationStateStore,
+      messagingClient
+    });
+
+    const postbackBody = JSON.stringify({
+      destination: "Ubot",
+      events: [
+        {
+          type: "postback",
+          replyToken: "reply-token-1",
+          timestamp: 1712900000000,
+          source: {
+            type: "user",
+            userId: "U-allowed"
+          },
+          postback: {
+            data: "menu=add"
+          }
+        }
+      ]
+    });
+    const contentBody = JSON.stringify({
+      destination: "Ubot",
+      events: [
+        {
+          type: "message",
+          replyToken: "reply-token-2",
+          timestamp: 1712900000001,
+          source: {
+            type: "user",
+            userId: "U-allowed"
+          },
+          message: {
+            id: "2",
+            type: "text",
+            text: "洗剤を買う"
+          }
+        }
+      ]
+    });
+
+    const postbackResponse = await app.request("/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-line-signature": createSignature(postbackBody)
+      },
+      body: postbackBody
+    });
+    const contentResponse = await app.request("/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-line-signature": createSignature(contentBody)
+      },
+      body: contentBody
+    });
+
+    expect(postbackResponse.status).toBe(200);
+    await expect(postbackResponse.json()).resolves.toMatchObject({
+      ok: true,
+      acceptedEvents: 1,
+      repliedEvents: 1,
+      events: [
+        {
+          status: "accepted",
+          userId: "U-allowed",
+          replyMessage: "追加したいタスク名を送って"
+        }
+      ]
+    });
+    expect(contentResponse.status).toBe(200);
+    await expect(contentResponse.json()).resolves.toMatchObject({
+      ok: true,
+      acceptedEvents: 1,
+      repliedEvents: 1,
+      events: [
+        {
+          status: "accepted",
+          userId: "U-allowed",
+          replyMessage: "追加したよ: 洗剤を買う"
+        }
+      ]
+    });
+    expect(conversationStateStore.save).toHaveBeenCalledWith("user:U-allowed", {
+      type: "awaiting-add-content"
+    });
+    expect(todoistGateway.addTask).toHaveBeenCalledWith("洗剤を買う");
+    expect(conversationStateStore.clear).toHaveBeenCalledWith("user:U-allowed");
+  });
+
+  it("ignores fill-in postback buttons without returning usage errors", async () => {
+    const messagingClient = {
+      replyMessage: vi.fn().mockResolvedValue({})
+    };
+    const app = createApp(config, { messagingClient });
+    const body = JSON.stringify({
+      destination: "Ubot",
+      events: [
+        {
+          type: "postback",
+          replyToken: "reply-token",
+          timestamp: 1712900000000,
+          source: {
+            type: "user",
+            userId: "U-allowed"
+          },
+          postback: {
+            data: "menu=add"
+          }
+        }
+      ]
+    });
+
+    const response = await app.request("/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-line-signature": createSignature(body)
+      },
+      body
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: true,
+      acceptedEvents: 0,
+      repliedEvents: 0,
+      events: [
+        {
+          status: "ignored",
+          reason: "unsupported-event"
+        }
+      ]
+    });
+    expect(messagingClient.replyMessage).not.toHaveBeenCalled();
   });
 });

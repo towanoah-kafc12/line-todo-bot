@@ -1,14 +1,25 @@
 import { Hono } from "hono";
 
 import type { AppConfig } from "../config/env.js";
-import { handleCommand, type ListStateStoreLike, type SharedTodoGateway } from "../commands/handlers.js";
+import {
+  handleCommand,
+  handleConversationText,
+  startAddConversation,
+  startEditConversation,
+  type ConversationStateStoreLike,
+  type ListStateStoreLike,
+  type SharedTodoGateway
+} from "../commands/handlers.js";
+import { parseCommand } from "../commands/parser.js";
 import { buildTextReplyMessage, createMessagingClient, type MessagingClientLike } from "../line/reply.js";
 import { handleWebhookRequest, type EventEvaluation } from "../line/webhook.js";
+import { InMemoryConversationStateStore } from "../state/conversation-state.js";
 import { InMemoryListStateStore } from "../state/list-state.js";
 import { createTodoistClient } from "../todoist/client.js";
 import { TodoistGateway } from "../todoist/gateway.js";
 
 type CreateAppDependencies = {
+  conversationStateStore?: ConversationStateStoreLike;
   listStateStore?: ListStateStoreLike;
   messagingClient?: MessagingClientLike;
   todoistGateway?: SharedTodoGateway;
@@ -32,6 +43,11 @@ export const createApp = (config: AppConfig, dependencies: CreateAppDependencies
     new InMemoryListStateStore({
       ttlSeconds: config.server.listStateTtlSeconds
     });
+  const conversationStateStore =
+    dependencies.conversationStateStore ??
+    new InMemoryConversationStateStore({
+      ttlSeconds: config.server.listStateTtlSeconds
+    });
   const messagingClient = dependencies.messagingClient ?? createMessagingClient(config);
 
   app.get("/", (context) =>
@@ -53,13 +69,55 @@ export const createApp = (config: AppConfig, dependencies: CreateAppDependencies
     const result = await handleWebhookRequest({
       allowedUserIds: config.line.allowedUserIds,
       channelSecret: config.line.channelSecret,
-      handleAcceptedCommand: ({ command, userId }) =>
-        handleCommand({
+      handleAuthorizedEvent: async ({ event, scopeKey }) => {
+        if (event.type === "postback") {
+          if (event.data === "menu=add") {
+            return startAddConversation({
+              conversationStateStore,
+              scopeKey
+            });
+          }
+
+          if (event.data === "menu=edit") {
+            return startEditConversation({
+              gateway: todoistGateway,
+              conversationStateStore,
+              listStateStore,
+              scopeKey
+            });
+          }
+
+          return null;
+        }
+
+        const conversationalReply = await handleConversationText({
+          gateway: todoistGateway,
+          conversationStateStore,
+          listStateStore,
+          scopeKey,
+          text: event.text
+        });
+
+        if (conversationalReply) {
+          return conversationalReply;
+        }
+
+        const command = parseCommand(event.text);
+
+        if (!command.ok) {
+          return {
+            ok: false as const,
+            errorMessage: command.errorMessage
+          };
+        }
+
+        return handleCommand({
           command: command.command,
           gateway: todoistGateway,
           listStateStore,
-          userId
-        }),
+          scopeKey
+        });
+      },
       rawBody,
       signature: context.req.header("x-line-signature")
     });
