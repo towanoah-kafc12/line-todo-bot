@@ -38,14 +38,15 @@ const createTask = (overrides: Partial<{
 });
 
 describe("TodoistGateway", () => {
-  it("lists only active tasks in the shared section", async () => {
+  it("lists only active tasks in the configured shared sections", async () => {
     const client = {
       getTask: vi.fn(),
       getTasks: vi.fn().mockResolvedValue({
         results: [
           createTask({ id: "shared-active" }),
+          createTask({ id: "shared-active-2", sectionId: "section-2" }),
           createTask({ id: "shared-completed", checked: true }),
-          createTask({ id: "other-section", sectionId: "section-2" })
+          createTask({ id: "other-section", sectionId: "section-3" })
         ],
         nextCursor: null
       }),
@@ -58,20 +59,23 @@ describe("TodoistGateway", () => {
     const gateway = new TodoistGateway({
       client,
       projectId: "project-1",
-      sectionId: "section-1",
+      sections: [
+        { id: "section-1", name: "買うもの" },
+        { id: "section-2", name: "やること" }
+      ],
       requestIdFactory: () => "req-1"
     });
 
     await expect(gateway.listActiveTasks()).resolves.toMatchObject([
-      { id: "shared-active" }
+      { id: "shared-active" },
+      { id: "shared-active-2" }
     ]);
     expect(client.getTasks).toHaveBeenCalledWith({
-      projectId: "project-1",
-      sectionId: "section-1"
+      projectId: "project-1"
     });
   });
 
-  it("adds a task with fixed project and section ids", async () => {
+  it("adds a task with fixed project and selected section ids", async () => {
     const client = {
       getTask: vi.fn(),
       getTasks: vi.fn(),
@@ -84,11 +88,14 @@ describe("TodoistGateway", () => {
     const gateway = new TodoistGateway({
       client,
       projectId: "project-1",
-      sectionId: "section-1",
+      sections: [
+        { id: "section-1", name: "買うもの" },
+        { id: "section-2", name: "やること" }
+      ],
       requestIdFactory: () => "req-add"
     });
 
-    await expect(gateway.addTask("洗剤を買う")).resolves.toMatchObject({
+    await expect(gateway.addTask("洗剤を買う", "section-2")).resolves.toMatchObject({
       id: "task-added",
       content: "牛乳を買う"
     });
@@ -96,7 +103,7 @@ describe("TodoistGateway", () => {
       {
         content: "洗剤を買う",
         projectId: "project-1",
-        sectionId: "section-1"
+        sectionId: "section-2"
       },
       "req-add",
     );
@@ -115,7 +122,9 @@ describe("TodoistGateway", () => {
     const gateway = new TodoistGateway({
       client,
       projectId: "project-1",
-      sectionId: "section-1"
+      sections: [
+        { id: "section-1", name: "買うもの" }
+      ]
     });
 
     await expect(gateway.addTask("不正な task")).rejects.toThrow(
@@ -137,7 +146,9 @@ describe("TodoistGateway", () => {
     const gateway = new TodoistGateway({
       client,
       projectId: "project-1",
-      sectionId: "section-1",
+      sections: [
+        { id: "section-1", name: "買うもの" }
+      ],
       requestIdFactory: () => "req-write"
     });
 
@@ -149,5 +160,28 @@ describe("TodoistGateway", () => {
     });
     expect(client.closeTask).toHaveBeenCalledWith("task-1", "req-write");
     expect(client.deleteTask).toHaveBeenCalledWith("task-1", "req-write");
+  });
+
+  it("exposes the configured section list", () => {
+    const gateway = new TodoistGateway({
+      client: {
+        getTask: vi.fn(),
+        getTasks: vi.fn(),
+        addTask: vi.fn(),
+        updateTask: vi.fn(),
+        closeTask: vi.fn(),
+        deleteTask: vi.fn()
+      },
+      projectId: "project-1",
+      sections: [
+        { id: "section-1", name: "買うもの" },
+        { id: "section-2", name: "やること" }
+      ]
+    });
+
+    expect(gateway.listSections()).toEqual([
+      { id: "section-1", name: "買うもの" },
+      { id: "section-2", name: "やること" }
+    ]);
   });
 });

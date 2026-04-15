@@ -47,18 +47,18 @@ MVP では本格的な IaC は置かない。
 2. サーバが `x-line-signature` と raw body を使って署名検証する
 3. `source.userId` が許可 userId に含まれるか確認する
 4. text message を明示コマンドとして parse する
-5. Todoist client が対象 `project_id` `section_id` の範囲だけ読む / 書く
+5. Todoist client が対象 `project_id` 配下の設定済み `section_id` 群だけ読む / 書く
 6. 操作結果を短い日本語メッセージに整形して Reply API で返す
 
-リッチメニューは MVP では `message action` を使い、押下時に `みる` などの既存テキストコマンドを送る方針にする。
-理由は、`postback` を新設せずに既存 parser と handler を再利用できるからだよ。
+リッチメニューは `一覧を見る` を `message action`、CRUD 補助を `postback action` で扱う方針にする。
+理由は、一覧は即時送信が自然で、追加 / 完了 / 削除 / 編集 は会話 state を持った方が誤操作を減らせるからだよ。
 
 ## Data Flow
 
 ### `みる`
 
-- Todoist の active tasks を `section_id` で絞って取得する
-- 表示順に番号を振る
+- Todoist の active tasks を設定済み `section_id` 群で絞って取得する
+- section 順と task 順で並べ、表示順に番号を振る
 - `LINE userId -> 表示中 task ID 配列` をメモリに保存する
 - 一覧本文を Reply API で返す
 
@@ -69,10 +69,11 @@ MVP では本格的な IaC は置かない。
 - Todoist の close / delete / update を実行する
 - 必要なら更新後一覧を返す
 
-### `追加 {内容}`
+### `追加`
 
-- `section_id` を明示して task を追加する
-- 追加後の task を元に成功メッセージを返す
+- rich menu から入った場合は、先に section を選ばせる
+- そのあと内容を受け取って、選ばれた `section_id` に task を追加する
+- 追加後の task と section 名を元に成功メッセージを返す
 
 ## Configuration Model
 
@@ -81,7 +82,8 @@ MVP では本格的な IaC は置かない。
 - `LINE_ALLOWED_USER_IDS`: 操作を許可する LINE userId の CSV
 - `TODOIST_API_TOKEN`: Todoist API 認証に使う
 - `TODOIST_PROJECT_ID`: 操作対象 project
-- `TODOIST_SECTION_ID`: 操作対象 section
+- `TODOIST_SECTION_IDS`: 操作対象 section ID の CSV
+- `TODOIST_SECTION_NAMES`: 操作対象 section 名の CSV
 - `PORT`: ローカル待受ポート
 - `LIST_STATE_TTL_SECONDS`: 番号付き一覧の有効期限
 
@@ -90,7 +92,7 @@ MVP では本格的な IaC は置かない。
 - 署名検証前に request body を加工しない
 - IP 制限ではなく署名検証を信頼の起点にする
 - 許可 userId 外の操作は即時拒否する
-- Todoist 側は必ず固定 `section_id` で絞り、他 section を触らない
+- Todoist 側は必ず固定 `project_id` と設定済み `section_id` 群で絞り、他 project / section を触らない
 - 秘密情報は `.env` から読む。ログには token や署名を出さない
 - Long-lived token を使う場合は、MVP の簡便性と引き換えに漏えい対策を強く意識する
 - 破壊操作の重複実行に備えて、Todoist write API は request id を付ける方針を採る

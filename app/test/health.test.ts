@@ -11,7 +11,10 @@ const config = {
   todoist: {
     apiToken: "todoist-token",
     projectId: "1234567890",
-    sectionId: "2345678901"
+    sections: [
+      { id: "2345678901", name: "買うもの" },
+      { id: "3456789012", name: "やること" }
+    ]
   },
   server: {
     port: 3000,

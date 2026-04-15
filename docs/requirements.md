@@ -7,7 +7,7 @@
 
 ## Goal
 
-LINE Bot を通じて、Todoist の特定 section にある active tasks を家の共有 TODO として扱えるようにする。
+LINE Bot を通じて、Todoist の特定 project 配下の共有 section 群にある active tasks を家の共有 TODO として扱えるようにする。
 Todoist を正本に保ち、同じ対象を LINE と Todoist の両方から操作できることが必須要件だ。
 
 ## Actors
@@ -20,13 +20,13 @@ Todoist を正本に保ち、同じ対象を LINE と Todoist の両方から操
 ### FR-01 一覧表示
 
 - コマンド: `みる`
-- 振る舞い: 対象 section の未完了 task を取得し、1 始まりの番号付き一覧で返す
+- 振る舞い: 対象 section 群の未完了 task を section ごとにまとめて取得し、1 始まりの番号付き一覧で返す
 - 理由: その後の `完了 2` `削除 2` `編集 2 ...` を番号で扱うため
 
 ### FR-02 追加
 
 - コマンド: `追加 {内容}`
-- 振る舞い: 内容が空でなければ、対象 section に task を追加する
+- 振る舞い: section を選んだうえで内容が空でなければ、対象 section に task を追加する
 - 理由: 同居人が Todoist を開かずに TODO を起票できる必要があるため
 
 ### FR-03 完了
@@ -50,11 +50,11 @@ Todoist を正本に保ち、同じ対象を LINE と Todoist の両方から操
 ### FR-06 認可
 
 - 振る舞い: 許可された LINE userId だけが Bot を操作できる
-- 理由: 家の共有 section 以外は見せず、不正操作を避けるため
+- 理由: 家の共有 project / section 以外は見せず、不正操作を避けるため
 
 ### FR-07 対象制限
 
-- 振る舞い: 対象 project_id と section_id を設定で固定し、他 project / section は操作しない
+- 振る舞い: 対象 project_id と section_id 群を設定で固定し、他 project / section は操作しない
 - 理由: Todoist の個人領域まで誤って触らないため
 
 ### FR-08 Reply API 中心
@@ -75,7 +75,7 @@ Todoist を正本に保ち、同じ対象を LINE と Todoist の両方から操
 | Command | Input Rule | Success Shape | Error Shape |
 | --- | --- | --- | --- |
 | `みる` | 追加引数なし | 番号付き一覧 | `使い方が違うよ` |
-| `追加 {内容}` | 内容必須 | `追加したよ: {task}` | `追加する内容が空だよ` |
+| `追加 {内容}` | 単一 section 時のみ直接追加可 | `追加したよ: {task}` | `追加ボタンからセクションを選んでね` |
 | `完了 {番号}` | 正の整数必須 | `完了したよ: {task}` | `番号が見つからないよ` |
 | `削除 {番号}` | 正の整数必須 | `削除したよ: {task}` | `番号が見つからないよ` |
 | `編集 {番号} {内容}` | 番号と内容が必須 | `更新したよ: {task}` | `新しい内容が空だよ` |

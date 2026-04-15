@@ -2,7 +2,7 @@
 
 ## Overview
 
-`line-todo-bot` は、LINE Bot を UI にして Todoist の特定 section を家の共有 TODO として扱うためのアプリだ。
+`line-todo-bot` は、LINE Bot を UI にして Todoist の特定 project 配下の共有 section 群を家の共有 TODO として扱うためのアプリだ。
 同居人は LINE だけを使い、管理者は Todoist も LINE も使える前提で、データの正本は Todoist に固定する。
 
 ## Current Status
@@ -49,7 +49,8 @@
 - `LINE_ALLOWED_USER_IDS`
 - `TODOIST_API_TOKEN`
 - `TODOIST_PROJECT_ID`
-- `TODOIST_SECTION_ID`
+- `TODOIST_SECTION_IDS`
+- `TODOIST_SECTION_NAMES`
 - `PORT`
 - `LIST_STATE_TTL_SECONDS`
 
@@ -98,10 +99,10 @@ npm run rich-menu:apply
 いまの rich menu では次の入口を出しているよ。
 
 - `一覧を見る`: `みる` を即送信する
-- `追加する`: 追加したいタスク名を聞く会話を始める
-- `完了する`: 入力欄に `完了 ` を入れてキーボードを開く
+- `追加する`: セクション選択とタスク名入力の会話を始める
+- `完了する`: 一覧を返して、完了したい番号の入力へ進める
 - `編集する`: 一覧を返して、編集したい番号の入力へ進める
-- `削除する`: 入力欄に `削除 ` を入れてキーボードを開く
+- `削除する`: 一覧を返して、削除したい番号の入力へ進める
 
 ## Common Troubles
 

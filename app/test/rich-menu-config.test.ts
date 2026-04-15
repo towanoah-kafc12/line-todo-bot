@@ -61,8 +61,7 @@ describe("default rich menu definition", () => {
             type: "postback",
             label: "完了する",
             data: "menu=complete",
-            inputOption: "openKeyboard",
-            fillInText: "完了 "
+            displayText: "タスクを完了する"
           }
         },
         {
@@ -90,8 +89,7 @@ describe("default rich menu definition", () => {
             type: "postback",
             label: "削除する",
             data: "menu=delete",
-            inputOption: "openKeyboard",
-            fillInText: "削除 "
+            displayText: "タスクを削除する"
           }
         }
       ]

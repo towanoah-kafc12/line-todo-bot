@@ -8,7 +8,8 @@ const envSchema = z.object({
   LINE_ALLOWED_USER_IDS: z.string().min(1, "LINE_ALLOWED_USER_IDS is required"),
   TODOIST_API_TOKEN: z.string().min(1, "TODOIST_API_TOKEN is required"),
   TODOIST_PROJECT_ID: z.string().min(1, "TODOIST_PROJECT_ID is required"),
-  TODOIST_SECTION_ID: z.string().min(1, "TODOIST_SECTION_ID is required"),
+  TODOIST_SECTION_IDS: z.string().min(1, "TODOIST_SECTION_IDS is required"),
+  TODOIST_SECTION_NAMES: z.string().min(1, "TODOIST_SECTION_NAMES is required"),
   PORT: z.coerce.number().int().positive().default(3000),
   LIST_STATE_TTL_SECONDS: z.coerce
     .number()
@@ -26,7 +27,10 @@ export type AppConfig = {
   todoist: {
     apiToken: string;
     projectId: string;
-    sectionId: string;
+    sections: Array<{
+      id: string;
+      name: string;
+    }>;
   };
   server: {
     port: number;
@@ -51,9 +55,19 @@ export const createConfig = (rawEnv: Record<string, string | undefined>): AppCon
   }
 
   const allowedUserIds = splitCsv(parsed.data.LINE_ALLOWED_USER_IDS);
+  const sectionIds = splitCsv(parsed.data.TODOIST_SECTION_IDS);
+  const sectionNames = splitCsv(parsed.data.TODOIST_SECTION_NAMES);
 
   if (allowedUserIds.length === 0) {
     throw new Error("Invalid environment variables: LINE_ALLOWED_USER_IDS must contain at least one user ID");
+  }
+
+  if (sectionIds.length === 0) {
+    throw new Error("Invalid environment variables: TODOIST_SECTION_IDS must contain at least one section ID");
+  }
+
+  if (sectionIds.length !== sectionNames.length) {
+    throw new Error("Invalid environment variables: TODOIST_SECTION_NAMES and TODOIST_SECTION_IDS must have the same number of entries");
   }
 
   return {
@@ -65,7 +79,10 @@ export const createConfig = (rawEnv: Record<string, string | undefined>): AppCon
     todoist: {
       apiToken: parsed.data.TODOIST_API_TOKEN,
       projectId: parsed.data.TODOIST_PROJECT_ID,
-      sectionId: parsed.data.TODOIST_SECTION_ID
+      sections: sectionIds.map((id, index) => ({
+        id,
+        name: sectionNames[index] ?? id
+      }))
     },
     server: {
       port: parsed.data.PORT,

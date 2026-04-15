@@ -24,8 +24,8 @@
 
 ### Manual Test
 
-- 実 LINE account から `みる` で一覧取得できる
-- `追加` で Todoist 対象 section に task が追加される
+- 実 LINE account から `みる` で section ごとの一覧取得ができる
+- `追加` で Todoist 対象 section を選んで task が追加される
 - `完了` が正しい task にだけ作用する
 - `削除` が正しい task にだけ作用する
 - `編集` が正しい task にだけ作用する
@@ -36,9 +36,9 @@
 
 | ID | Case | Type | Expected Result |
 | --- | --- | --- | --- |
-| TP-001 | `みる` | Unit / Integration / Manual | 対象 section の未完了 task が番号付きで返る |
-| TP-002 | `追加 買い物` | Unit / Integration / Manual | task が section に追加され成功文が返る |
-| TP-003 | `追加` | Unit / Integration | `追加する内容が空だよ` が返る |
+| TP-001 | `みる` | Unit / Integration / Manual | 対象 section 群の未完了 task が番号付きで返る |
+| TP-002 | `追加する` -> section 選択 -> タイトル送信 | Integration / Manual | task が選んだ section に追加され成功文が返る |
+| TP-003 | `追加 {内容}` | Unit / Integration | 複数 section 時は `追加ボタンからセクションを選んでね` が返る |
 | TP-004 | `完了 2` | Unit / Integration / Manual | 対応 task が close される |
 | TP-005 | `削除 2` | Unit / Integration / Manual | 対応 task が delete される |
 | TP-006 | `編集 2 牛乳` | Unit / Integration / Manual | 対応 task の content が更新される |

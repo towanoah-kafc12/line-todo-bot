@@ -5,6 +5,8 @@ import {
   handleCommand,
   handleConversationText,
   startAddConversation,
+  startCompleteConversation,
+  startDeleteConversation,
   startEditConversation,
   type ConversationStateStoreLike,
   type ListStateStoreLike,
@@ -36,7 +38,7 @@ export const createApp = (config: AppConfig, dependencies: CreateAppDependencies
     new TodoistGateway({
       client: createTodoistClient(config),
       projectId: config.todoist.projectId,
-      sectionId: config.todoist.sectionId
+      sections: config.todoist.sections
     });
   const listStateStore =
     dependencies.listStateStore ??
@@ -73,7 +75,26 @@ export const createApp = (config: AppConfig, dependencies: CreateAppDependencies
         if (event.type === "postback") {
           if (event.data === "menu=add") {
             return startAddConversation({
+              gateway: todoistGateway,
               conversationStateStore,
+              scopeKey
+            });
+          }
+
+          if (event.data === "menu=complete") {
+            return startCompleteConversation({
+              gateway: todoistGateway,
+              conversationStateStore,
+              listStateStore,
+              scopeKey
+            });
+          }
+
+          if (event.data === "menu=delete") {
+            return startDeleteConversation({
+              gateway: todoistGateway,
+              conversationStateStore,
+              listStateStore,
               scopeKey
             });
           }

@@ -1,7 +1,10 @@
 export type ConversationState =
-  | { type: "awaiting-add-content" }
+  | { type: "awaiting-add-section" }
+  | { type: "awaiting-add-content"; sectionId: string }
   | { type: "awaiting-edit-index" }
-  | { type: "awaiting-edit-content"; taskId: string };
+  | { type: "awaiting-edit-content"; taskId: string }
+  | { type: "awaiting-complete-index" }
+  | { type: "awaiting-delete-index" };
 
 type StoredConversationState = {
   expiresAt: number;

@@ -130,15 +130,15 @@ Todoist 公式 docs では、個人 token は integrations settings から取得
 
 - `TODOIST_API_TOKEN`
 
-### 2. Prepare the target project and section
+### 2. Prepare the target project and sections
 
-Todoist 上で共有用 project を 1 つ決め、その中に共有用 section を 1 つ作る。
-MVP では section を 1 つに固定する理由は、誤操作範囲を最小化するためだ。
+Todoist 上で共有用 project を 1 つ決め、その中に共有用 section を必要数だけ作る。
+現在の実装は `共有` project 配下の `買うもの` と `やること` の 2 section を前提にしているよ。
 
 控えるもの:
 
 - project 名
-- section 名
+- section 名の一覧
 
 ### 3. Confirm `project_id`
 
@@ -173,7 +173,8 @@ curl -s -H "Authorization: Bearer $TODOIST_API_TOKEN" \
 
 環境変数:
 
-- `TODOIST_SECTION_ID`
+- `TODOIST_SECTION_IDS`
+- `TODOIST_SECTION_NAMES`
 
 ## App Side
 
@@ -187,7 +188,8 @@ LINE_CHANNEL_ACCESS_TOKEN=your-channel-access-token
 LINE_ALLOWED_USER_IDS=Uxxxxxxxxxxxxxxxx,Uyyyyyyyyyyyyyyyy
 TODOIST_API_TOKEN=your-todoist-token
 TODOIST_PROJECT_ID=1234567890
-TODOIST_SECTION_ID=2345678901
+TODOIST_SECTION_IDS=2345678901,3456789012
+TODOIST_SECTION_NAMES=買うもの,やること
 PORT=3000
 LIST_STATE_TTL_SECONDS=900
 ```
@@ -229,9 +231,9 @@ npx wrangler tunnel quick-start http://localhost:3000
 
 ### 5. Verify Todoist integration
 
-- `みる` で対象 section の active tasks が返る
-- `追加 買い物` で対象 section に task が増える
-- `完了 1` `削除 1` `編集 1 牛乳を買う` が対象 task にだけ作用する
+- `みる` で対象 2 section の active tasks が section ごとに返る
+- `追加する` で section を選んで task を追加できる
+- `完了する` `削除する` `編集する` で対象 task にだけ作用する
 
 ## Rich Menu Side
 
@@ -249,10 +251,10 @@ npx wrangler tunnel quick-start http://localhost:3000
 
 この repo には、主要コマンドへ誘導する default rich menu 定義と画像を置いてある。
 `一覧を見る` は `message action` で `みる` を即送信する。
-`完了する` `削除する` は `postback action` でキーボードを開いてコマンド文字列を事前入力する。
-`追加する` は `postback action` でタイトル入力待ちを始める。
+`完了する` `削除する` は `postback action` で一覧表示と番号入力待ちを始める。
+`追加する` は `postback action` で section 選択とタイトル入力待ちを始める。
 `編集する` は `postback action` で一覧表示と番号入力待ちを始める。
-理由は、追加と編集は会話型の方が自然で、入力ミスや番号確認漏れを減らせるからだよ。
+理由は、複数 section と番号付き操作では会話型の方が自然で、入力ミスや番号確認漏れを減らせるからだよ。
 
 実行コマンド:
 
@@ -279,8 +281,9 @@ npm run rich-menu:delete -- <richMenuId>
 - スマホ版 LINE の個人チャットで rich menu が見える
 - グループでも rich menu が見える
 - `一覧を見る` を押すと `みる` が送られる
-- `追加する` を押すと `追加したいタスク名を送って` が返る
-- `完了する` `削除する` を押すと、入力欄に対応するコマンドが補完される
+- `追加する` を押すと section 選択とタスク名入力の会話が始まる
+- `完了する` を押すと、一覧と `完了したい番号を送って` が返る
+- `削除する` を押すと、一覧と `削除したい番号を送って` が返る
 - `編集する` を押すと、一覧と `編集したい番号を送って` が返る
 - Bot が Reply API で一覧を返す
 
@@ -290,7 +293,7 @@ npm run rich-menu:delete -- <richMenuId>
 - channel secret と access token を取り違えている
 - Greeting / Auto-reply が有効のままで応答が二重になる
 - `LINE_ALLOWED_USER_IDS` に userId ではなく LINE ID を入れてしまう
-- Todoist token は正しいが `project_id` と `section_id` が対象とずれている
+- Todoist token は正しいが `project_id` と `section_ids` が対象とずれている
 
 ## Revision History
 
