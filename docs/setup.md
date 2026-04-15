@@ -237,36 +237,38 @@ npx wrangler tunnel quick-start http://localhost:3000
 
 ## Rich Menu Side
 
-### 1. Use the default rich menu managed by Messaging API
+### 1. Use rich menus managed by Messaging API
 
-今回は LINE Official Account Manager ではなく Messaging API で default rich menu を管理する。
-理由は、設定をコード化して再現しやすくするためだよ。
+今回は LINE Official Account Manager ではなく Messaging API で、default main menu と会話中の per-user rich menu を管理する。
+理由は、設定をコード化して再現しやすくするのと、会話 state に応じて `キャンセル` 中心の menu へ切り替えたいからだよ。
 
 注意:
 
 - 同じ rich menu を Manager と Messaging API の両方から編集しない
 - デスクトップ版 LINE では rich menu は表示されない
 
-### 2. Apply the default rich menu
+### 2. Generate and apply the rich menu set
 
-この repo には、主要コマンドへ誘導する default rich menu 定義と画像を置いてある。
+この repo には、main menu と state menu 群の定義と画像を置いてある。
 `一覧を見る` は `message action` で `みる` を即送信する。
-`完了する` `削除する` は `postback action` で一覧表示と番号入力待ちを始める。
-`追加する` は `postback action` で section 選択とタイトル入力待ちを始める。
-`編集する` は `postback action` で一覧表示と番号入力待ちを始める。
+`追加する` `完了する` `削除する` `編集する` は `postback action` で会話を始める。
+会話中は、user ごとに `追加中` `編集中` `完了中` `削除中` menu に切り替わる。
+状態別 menu では `キャンセル` と `一覧を見る` を出す。
 理由は、複数 section と番号付き操作では会話型の方が自然で、入力ミスや番号確認漏れを減らせるからだよ。
 
 実行コマンド:
 
 ```bash
+npm run rich-menu:images
 npm run rich-menu:apply
 ```
 
 このコマンドがやること:
 
-1. `assets/line/default-rich-menu.json` を使って rich menu を作る
-2. `assets/line/default-rich-menu.png` を画像として upload する
-3. 作成した rich menu を default rich menu に設定する
+1. `assets/line/*.json` と `assets/line/*.png` を使って main / add / edit / complete / delete の rich menu を作る
+2. それぞれの画像を upload する
+3. `todo-main` `todo-add` `todo-edit` `todo-complete` `todo-delete` の alias を更新する
+4. main rich menu を default rich menu に設定する
 
 補助コマンド:
 
@@ -276,7 +278,7 @@ npm run rich-menu:clear
 npm run rich-menu:delete -- <richMenuId>
 ```
 
-### 3. Verify the default rich menu
+### 3. Verify the rich menu behavior
 
 - スマホ版 LINE の個人チャットで rich menu が見える
 - グループでも rich menu が見える
@@ -285,6 +287,9 @@ npm run rich-menu:delete -- <richMenuId>
 - `完了する` を押すと、一覧と `完了したい番号を送って` が返る
 - `削除する` を押すと、一覧と `削除したい番号を送って` が返る
 - `編集する` を押すと、一覧と `編集したい番号を送って` が返る
+- 会話中は `追加中` `編集中` `完了中` `削除中` の menu に切り替わる
+- `キャンセル` を押すと default main menu に戻る
+- `一覧を見る` を押しても会話 state は保たれる
 - Bot が Reply API で一覧を返す
 
 ## Common Failure Points
@@ -301,3 +306,4 @@ npm run rich-menu:delete -- <richMenuId>
 | --- | --- | --- | --- |
 | 2026-04-12 | 0.1 | LINE と Todoist の公式調査に基づく初版作成 | Q-COM-004 |
 | 2026-04-14 | 0.2 | Messaging API で default rich menu を適用する手順を追加 | - |
+| 2026-04-15 | 0.3 | 会話 state ごとの per-user rich menu と生成手順を追加 | Q-APP-004 |

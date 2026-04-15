@@ -20,12 +20,12 @@
 - 番号付き一覧 state
 - command handler
 - Reply API 送信の配線
-- default rich menu を Messaging API で設定するスクリプト
+- default rich menu と per-user rich menu を Messaging API で設定するスクリプト
 
 まだ未実装または未確定のもの:
 
 - AWS への本番デプロイ
-- リッチメニューの追加ボタン設計
+- 状態別 rich menu のビジュアル改善
 
 ## Target Users
 
@@ -90,19 +90,21 @@ npm run test
 - `docs/requirements.md`
 - `docs/ARCHITECTURE.md`
 
-default rich menu を適用するコマンド:
+会話用 rich menu 群を適用するコマンド:
 
 ```bash
+npm run rich-menu:images
 npm run rich-menu:apply
 ```
 
-いまの rich menu では次の入口を出しているよ。
+いまの rich menu は、通常時は default main menu、会話中は per-user rich menu へ自動で切り替わるよ。
 
 - `一覧を見る`: `みる` を即送信する
 - `追加する`: セクション選択とタスク名入力の会話を始める
 - `完了する`: 一覧を返して、完了したい番号の入力へ進める
 - `編集する`: 一覧を返して、編集したい番号の入力へ進める
 - `削除する`: 一覧を返して、削除したい番号の入力へ進める
+- `追加中` `編集中` `完了中` `削除中`: `キャンセル` と `一覧を見る` を出す
 
 ## Common Troubles
 

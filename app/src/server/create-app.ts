@@ -4,6 +4,7 @@ import type { AppConfig } from "../config/env.js";
 import {
   handleCommand,
   handleConversationText,
+  showTaskList,
   startAddConversation,
   startCompleteConversation,
   startDeleteConversation,
@@ -13,6 +14,10 @@ import {
   type SharedTodoGateway
 } from "../commands/handlers.js";
 import { parseCommand } from "../commands/parser.js";
+import {
+  createConversationRichMenuManager,
+  type ConversationRichMenuManagerLike
+} from "../line/conversation-rich-menu.js";
 import { buildTextReplyMessage, createMessagingClient, type MessagingClientLike } from "../line/reply.js";
 import { handleWebhookRequest, type EventEvaluation } from "../line/webhook.js";
 import { InMemoryConversationStateStore } from "../state/conversation-state.js";
@@ -24,6 +29,7 @@ type CreateAppDependencies = {
   conversationStateStore?: ConversationStateStoreLike;
   listStateStore?: ListStateStoreLike;
   messagingClient?: MessagingClientLike;
+  conversationRichMenuManager?: ConversationRichMenuManagerLike;
   todoistGateway?: SharedTodoGateway;
 };
 
@@ -51,6 +57,9 @@ export const createApp = (config: AppConfig, dependencies: CreateAppDependencies
       ttlSeconds: config.server.listStateTtlSeconds
     });
   const messagingClient = dependencies.messagingClient ?? createMessagingClient(config);
+  const conversationRichMenuManager =
+    dependencies.conversationRichMenuManager ??
+    createConversationRichMenuManager(messagingClient);
 
   app.get("/", (context) =>
     context.json({
@@ -71,73 +80,82 @@ export const createApp = (config: AppConfig, dependencies: CreateAppDependencies
     const result = await handleWebhookRequest({
       allowedUserIds: config.line.allowedUserIds,
       channelSecret: config.line.channelSecret,
-      handleAuthorizedEvent: async ({ event, scopeKey }) => {
+      handleAuthorizedEvent: async ({ event, scopeKey, userId }) => {
+        let replyMessage: string | { ok: false; errorMessage: string } | null;
+
         if (event.type === "postback") {
           if (event.data === "menu=add") {
-            return startAddConversation({
+            replyMessage = await startAddConversation({
               gateway: todoistGateway,
               conversationStateStore,
               scopeKey
             });
-          }
-
-          if (event.data === "menu=complete") {
-            return startCompleteConversation({
-              gateway: todoistGateway,
-              conversationStateStore,
-              listStateStore,
-              scopeKey
-            });
-          }
-
-          if (event.data === "menu=delete") {
-            return startDeleteConversation({
+          } else if (event.data === "menu=complete") {
+            replyMessage = await startCompleteConversation({
               gateway: todoistGateway,
               conversationStateStore,
               listStateStore,
               scopeKey
             });
-          }
-
-          if (event.data === "menu=edit") {
-            return startEditConversation({
+          } else if (event.data === "menu=delete") {
+            replyMessage = await startDeleteConversation({
               gateway: todoistGateway,
               conversationStateStore,
               listStateStore,
               scopeKey
             });
+          } else if (event.data === "menu=edit") {
+            replyMessage = await startEditConversation({
+              gateway: todoistGateway,
+              conversationStateStore,
+              listStateStore,
+              scopeKey
+            });
+          } else if (event.data === "menu=list-preview") {
+            replyMessage = await showTaskList({
+              gateway: todoistGateway,
+              listStateStore,
+              scopeKey
+            });
+          } else {
+            replyMessage = null;
           }
+        } else {
+          const conversationalReply = await handleConversationText({
+            gateway: todoistGateway,
+            conversationStateStore,
+            listStateStore,
+            scopeKey,
+            text: event.text
+          });
 
-          return null;
+          if (conversationalReply) {
+            replyMessage = conversationalReply;
+          } else {
+            const command = parseCommand(event.text);
+
+            if (!command.ok) {
+              replyMessage = {
+                ok: false as const,
+                errorMessage: command.errorMessage
+              };
+            } else {
+              replyMessage = await handleCommand({
+                command: command.command,
+                gateway: todoistGateway,
+                listStateStore,
+                scopeKey
+              });
+            }
+          }
         }
 
-        const conversationalReply = await handleConversationText({
-          gateway: todoistGateway,
-          conversationStateStore,
-          listStateStore,
-          scopeKey,
-          text: event.text
-        });
+        await conversationRichMenuManager.sync(
+          userId,
+          conversationStateStore.load(scopeKey),
+        );
 
-        if (conversationalReply) {
-          return conversationalReply;
-        }
-
-        const command = parseCommand(event.text);
-
-        if (!command.ok) {
-          return {
-            ok: false as const,
-            errorMessage: command.errorMessage
-          };
-        }
-
-        return handleCommand({
-          command: command.command,
-          gateway: todoistGateway,
-          listStateStore,
-          scopeKey
-        });
+        return replyMessage;
       },
       rawBody,
       signature: context.req.header("x-line-signature")

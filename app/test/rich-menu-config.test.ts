@@ -3,18 +3,14 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-const richMenuDefinitionPath = path.resolve(
-  process.cwd(),
-  "assets",
-  "line",
-  "default-rich-menu.json",
-);
+const lineAssetDir = path.resolve(process.cwd(), "assets", "line");
 
-describe("default rich menu definition", () => {
-  it("uses message and postback actions that guide the main commands", () => {
-    const definition = JSON.parse(readFileSync(richMenuDefinitionPath, "utf8"));
+const loadDefinition = (fileName: string) =>
+  JSON.parse(readFileSync(path.join(lineAssetDir, fileName), "utf8"));
 
-    expect(definition).toEqual({
+describe("rich menu definitions", () => {
+  it("keeps the default main menu actions", () => {
+    expect(loadDefinition("default-rich-menu.json")).toEqual({
       size: {
         width: 2500,
         height: 1686
@@ -93,6 +89,79 @@ describe("default rich menu definition", () => {
           }
         }
       ]
+    });
+  });
+
+  it("defines state menus with cancel and list-preview actions", () => {
+    const expectedAreas = [
+      {
+        bounds: {
+          x: 0,
+          y: 1080,
+          width: 1250,
+          height: 606
+        },
+        action: {
+          type: "message",
+          label: "キャンセル",
+          text: "キャンセル"
+        }
+      },
+      {
+        bounds: {
+          x: 1250,
+          y: 1080,
+          width: 1250,
+          height: 606
+        },
+        action: {
+          type: "postback",
+          label: "一覧を見る",
+          data: "menu=list-preview",
+          displayText: "一覧を見直す"
+        }
+      }
+    ];
+
+    expect(loadDefinition("add-rich-menu.json")).toEqual({
+      size: {
+        width: 2500,
+        height: 1686
+      },
+      selected: false,
+      name: "state-add-menu",
+      chatBarText: "追加中",
+      areas: expectedAreas
+    });
+    expect(loadDefinition("edit-rich-menu.json")).toEqual({
+      size: {
+        width: 2500,
+        height: 1686
+      },
+      selected: false,
+      name: "state-edit-menu",
+      chatBarText: "編集中",
+      areas: expectedAreas
+    });
+    expect(loadDefinition("complete-rich-menu.json")).toEqual({
+      size: {
+        width: 2500,
+        height: 1686
+      },
+      selected: false,
+      name: "state-complete-menu",
+      chatBarText: "完了中",
+      areas: expectedAreas
+    });
+    expect(loadDefinition("delete-rich-menu.json")).toEqual({
+      size: {
+        width: 2500,
+        height: 1686
+      },
+      selected: false,
+      name: "state-delete-menu",
+      chatBarText: "削除中",
+      areas: expectedAreas
     });
   });
 });

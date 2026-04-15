@@ -12,6 +12,7 @@
     "start": "node dist/app/src/index.js",
     "lint": "npx eslint .",
     "test": "npx vitest run",
+    "rich-menu:images": "powershell -ExecutionPolicy Bypass -File ./scripts/generate-rich-menu-images.ps1",
     "rich-menu:apply": "node scripts/line-rich-menu.mjs apply-default",
     "rich-menu:list": "node scripts/line-rich-menu.mjs list",
     "rich-menu:clear": "node scripts/line-rich-menu.mjs clear-default",

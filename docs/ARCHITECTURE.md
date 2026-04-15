@@ -2,7 +2,7 @@
 
 ## System Context
 
-- Frontend: 独立した画面はなし。利用者 UI は LINE の 1 対 1 チャット、グループ、デフォルトのリッチメニュー
+- Frontend: 独立した画面はなし。利用者 UI は LINE の 1 対 1 チャット、グループ、デフォルト rich menu、状態別の per-user rich menu
 - Backend/API: Node.js + TypeScript の小さな Webhook サーバ
 - Database: MVP では永続 DB なし。番号付き一覧の対応表はメモリ保持を暫定採用
 - AWS: 対象外。ローカル PC ホストのみ
@@ -51,7 +51,8 @@ MVP では本格的な IaC は置かない。
 6. 操作結果を短い日本語メッセージに整形して Reply API で返す
 
 リッチメニューは `一覧を見る` を `message action`、CRUD 補助を `postback action` で扱う方針にする。
-理由は、一覧は即時送信が自然で、追加 / 完了 / 削除 / 編集 は会話 state を持った方が誤操作を減らせるからだよ。
+通常時は default main menu を出し、会話 state がある間だけ per-user rich menu を user 単位で上書きする。
+理由は、一覧は即時送信が自然で、追加 / 完了 / 削除 / 編集 は会話 state を持った方が誤操作を減らせるうえ、会話中だけ `キャンセル` を大きく出した方が迷いにくいからだよ。
 
 ## Data Flow
 
@@ -74,6 +75,21 @@ MVP では本格的な IaC は置かない。
 - rich menu から入った場合は、先に section を選ばせる
 - そのあと内容を受け取って、選ばれた `section_id` に task を追加する
 - 追加後の task と section 名を元に成功メッセージを返す
+
+## Rich Menu State Model
+
+- `todo-main`: 通常時の default main menu
+- `todo-add`: `awaiting-add-section` と `awaiting-add-content` の間だけ user に link する
+- `todo-edit`: `awaiting-edit-index` と `awaiting-edit-content` の間だけ user に link する
+- `todo-complete`: `awaiting-complete-index` の間だけ user に link する
+- `todo-delete`: `awaiting-delete-index` の間だけ user に link する
+
+会話 state が消えたら user の per-user rich menu を unlink して、default main menu に戻す。
+この切替は Webhook ごとに state を再評価して同期する。
+
+制約もあるよ。
+per-user rich menu は user 単位なので、同じ user が個人チャットとグループの両方で同時進行すると、見た目の menu 状態は共有される。
+ここは LINE の room 単位スコープが無いことによる仕様上の限界として扱う。
 
 ## Configuration Model
 
@@ -122,3 +138,4 @@ MVP では本格的な IaC は置かない。
 | 2026-04-11 | 0.2 | 課題管理と設計改訂の連動ルールを追加 | - |
 | 2026-04-12 | 0.3 | LINE Webhook と Todoist section 連携の想定構成を追加 | Q-COM-002, Q-COM-003, Q-COM-004 |
 | 2026-04-14 | 0.4 | デフォルトのリッチメニューを既存テキストコマンドへつなぐ方針を追加 | - |
+| 2026-04-15 | 0.5 | 会話 state に応じて per-user rich menu を切り替える構成を追加 | Q-APP-004 |

@@ -836,4 +836,86 @@ describe("POST /webhook", () => {
     expect(todoistGateway.deleteTask).toHaveBeenCalledWith("task-2");
     expect(conversationStateStore.clear).toHaveBeenCalledWith("user:U-allowed");
   });
+
+  it("shows list preview from a state menu without ending the conversation", async () => {
+    const todoistGateway = {
+      listActiveTasks: vi.fn().mockResolvedValue([
+        { id: "task-1", content: "牛乳を買う", sectionName: "買うもの" },
+        { id: "task-2", content: "ゴミを出す", sectionName: "やること" }
+      ]),
+      listSections: vi.fn().mockReturnValue(config.todoist.sections),
+      addTask: vi.fn(),
+      updateTask: vi.fn(),
+      completeTask: vi.fn(),
+      deleteTask: vi.fn()
+    };
+    const listStateStore = {
+      save: vi.fn(),
+      resolve: vi.fn(),
+      clear: vi.fn()
+    };
+    const conversationStateStore = {
+      save: vi.fn(),
+      load: vi.fn().mockReturnValue({ type: "awaiting-edit-index" }),
+      clear: vi.fn()
+    };
+    const messagingClient = {
+      replyMessage: vi.fn().mockResolvedValue({})
+    };
+    const conversationRichMenuManager = {
+      sync: vi.fn().mockResolvedValue(undefined)
+    };
+    const app = createApp(config, {
+      todoistGateway,
+      listStateStore,
+      conversationStateStore,
+      conversationRichMenuManager,
+      messagingClient
+    });
+    const body = JSON.stringify({
+      destination: "Ubot",
+      events: [
+        {
+          type: "postback",
+          replyToken: "reply-token-preview",
+          timestamp: 1712900000010,
+          source: {
+            type: "user",
+            userId: "U-allowed"
+          },
+          postback: {
+            data: "menu=list-preview"
+          }
+        }
+      ]
+    });
+
+    const response = await app.request("/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-line-signature": createSignature(body)
+      },
+      body
+    });
+
+    expect(response.status).toBe(200);
+    await expect(response.json()).resolves.toMatchObject({
+      ok: true,
+      acceptedEvents: 1,
+      repliedEvents: 1,
+      events: [
+        {
+          status: "accepted",
+          userId: "U-allowed",
+          replyMessage: "[買うもの]\n1. 牛乳を買う\n\n[やること]\n2. ゴミを出す"
+        }
+      ]
+    });
+    expect(listStateStore.save).toHaveBeenCalledWith("user:U-allowed", ["task-1", "task-2"]);
+    expect(conversationRichMenuManager.sync).toHaveBeenCalledWith("U-allowed", {
+      type: "awaiting-edit-index"
+    });
+    expect(conversationStateStore.clear).not.toHaveBeenCalled();
+  });
 });

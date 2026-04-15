@@ -109,6 +109,19 @@ const resolveTaskId = (
   index: number,
 ): string | null => listStateStore.resolve(scopeKey, index);
 
+export const showTaskList = async ({
+  gateway,
+  listStateStore,
+  scopeKey
+}: Pick<HandleCommandOptions, "gateway" | "listStateStore" | "scopeKey">): Promise<string> => {
+  const tasks = await gateway.listActiveTasks();
+  listStateStore.save(
+    scopeKey,
+    tasks.map((task) => task.id),
+  );
+  return formatTaskList(tasks);
+};
+
 export const startEditConversation = async ({
   gateway,
   conversationStateStore,
@@ -337,12 +350,11 @@ export const handleCommand = async ({
 }: HandleCommandOptions): Promise<string> => {
   switch (command.type) {
     case "list": {
-      const tasks = await gateway.listActiveTasks();
-      listStateStore.save(
-        scopeKey,
-        tasks.map((task) => task.id),
-      );
-      return formatTaskList(tasks);
+      return showTaskList({
+        gateway,
+        listStateStore,
+        scopeKey
+      });
     }
 
     case "add": {
