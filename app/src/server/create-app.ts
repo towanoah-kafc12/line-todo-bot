@@ -135,7 +135,6 @@ export const createApp = (config: AppConfig, dependencies: CreateAppDependencies
       channelSecret: config.line.channelSecret,
       handleAuthorizedEvent: async ({ event, scopeKey, userId }) => {
         let replyMessage: string | { ok: false; errorMessage: string } | null;
-        const currentConversationState = conversationStateStore.load(scopeKey);
 
         if (event.type === "postback") {
           const parsedPostback = parseMenuPostback(event.data);
@@ -171,14 +170,15 @@ export const createApp = (config: AppConfig, dependencies: CreateAppDependencies
               scopeKey
             });
           } else if (parsedPostback?.kind === "menu" && parsedPostback.menu === "list-preview") {
+            const stateForPreview = conversationStateStore.load(scopeKey);
+
             replyMessage = await showTaskList({
               gateway: todoistGateway,
               listStateStore,
               scopeKey,
               sectionId:
-                currentConversationState &&
-                "sectionId" in currentConversationState
-                  ? currentConversationState.sectionId
+                stateForPreview && "sectionId" in stateForPreview
+                  ? stateForPreview.sectionId
                   : undefined
             });
           } else if (parsedPostback?.kind === "menu" && parsedPostback.menu === "list-all") {

@@ -407,8 +407,9 @@ describe("POST /webhook", () => {
       save: vi.fn(),
       load: vi
         .fn()
-        .mockReturnValueOnce({ type: "awaiting-edit-section" })
         .mockReturnValueOnce({ type: "awaiting-edit-index", sectionId: "2345678901" })
+        .mockReturnValueOnce({ type: "awaiting-edit-index", sectionId: "2345678901" })
+        .mockReturnValueOnce({ type: "awaiting-edit-content", taskId: "task-1", sectionId: "2345678901" })
         .mockReturnValueOnce({ type: "awaiting-edit-content", taskId: "task-1", sectionId: "2345678901" })
         .mockReturnValueOnce(null),
       clear: vi.fn()
