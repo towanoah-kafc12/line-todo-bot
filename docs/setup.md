@@ -250,11 +250,12 @@ npx wrangler tunnel quick-start http://localhost:3000
 ### 2. Generate and apply the rich menu set
 
 この repo には、main menu と state menu 群の定義と画像を置いてある。
-`一覧を見る` は `message action` で `みる` を即送信する。
-`追加する` `完了する` `削除する` `編集する` は `postback action` で会話を始める。
+通常時の main menu は `表示する` `追加する` `完了する` `編集する` `削除する` の入口だけを出す。
+`表示する` は `todo-list` へ遷移し、`買うもの` `やること` `キャンセル` `全部見る` を出す。
+`追加する` `完了する` `削除する` `編集する` は `postback action` で会話を始め、section 選択後に次の入力へ進む。
 会話中は、user ごとに `追加中` `編集中` `完了中` `削除中` menu に切り替わる。
 状態別 menu では `キャンセル` と `一覧を見る` を出す。
-理由は、複数 section と番号付き操作では会話型の方が自然で、入力ミスや番号確認漏れを減らせるからだよ。
+理由は、複数 section 前提で最初に操作種別を選び、その後 section を固定した方が誤操作を減らせるからだよ。
 
 実行コマンド:
 

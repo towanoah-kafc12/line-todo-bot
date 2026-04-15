@@ -1,3 +1,5 @@
+/* global process, console */
+
 import "dotenv/config";
 
 import { readFile } from "node:fs/promises";
@@ -60,7 +62,7 @@ const getChannelAccessToken = () => {
 
 const requestLineApi = async (pathname, options = {}, baseUrl = lineApiBaseUrl) => {
   const token = getChannelAccessToken();
-  const response = await fetch(`${baseUrl}${pathname}`, {
+  const response = await globalThis.fetch(`${baseUrl}${pathname}`, {
     ...options,
     headers: {
       Authorization: `Bearer ${token}`,
@@ -125,7 +127,7 @@ const applyAllRichMenus = async () => {
   for (const richMenu of richMenus) {
     const richMenuDefinition = await loadRichMenuDefinition(richMenu.definitionPath);
     const richMenuImage = await readFile(richMenu.imagePath);
-  const createResponse = await requestLineApi("/v2/bot/richmenu", {
+    const createResponse = await requestLineApi("/v2/bot/richmenu", {
     method: "POST",
     headers: {
       "content-type": "application/json"
