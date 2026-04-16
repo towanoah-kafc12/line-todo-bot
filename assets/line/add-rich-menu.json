@@ -3,7 +3,7 @@
     "width": 2500,
     "height": 1686
   },
-  "selected": false,
+  "selected": true,
   "name": "state-add-menu",
   "chatBarText": "追加中",
   "areas": [
@@ -18,7 +18,8 @@
         "type": "postback",
         "label": "買うもの",
         "data": "menu=add:section:2345678901",
-        "displayText": "買うものに追加する"
+        "displayText": "買うものに追加する",
+        "inputOption": "openKeyboard"
       }
     },
     {
@@ -32,7 +33,8 @@
         "type": "postback",
         "label": "やること",
         "data": "menu=add:section:3456789012",
-        "displayText": "やることに追加する"
+        "displayText": "やることに追加する",
+        "inputOption": "openKeyboard"
       }
     },
     {

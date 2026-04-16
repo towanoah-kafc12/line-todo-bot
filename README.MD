@@ -97,6 +97,10 @@ npm run rich-menu:images
 npm run rich-menu:apply
 ```
 
+`npm run rich-menu:apply` は `.env` の `TODOIST_SECTION_IDS` / `TODOIST_SECTION_NAMES` を読んで、
+section 選択メニューのラベルと postback を差し替えてから適用するよ。
+いまのレイアウトは最大 2 section 前提だよ。
+
 いまの rich menu は、通常時は default main menu、会話中は per-user rich menu へ自動で切り替わるよ。
 
 - `表示する`: section 選択メニュー (`todo-list`) を表示する

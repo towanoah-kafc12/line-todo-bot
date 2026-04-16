@@ -99,7 +99,7 @@ describe("rich menu definitions", () => {
         width: 2500,
         height: 1686
       },
-      selected: false,
+      selected: true,
       name: "state-list-menu",
       chatBarText: "表示中",
       areas: [
@@ -194,25 +194,29 @@ describe("rich menu definitions", () => {
     ];
 
     expect(loadDefinition("add-rich-menu.json")).toMatchObject({
+      selected: true,
       name: "state-add-menu",
       chatBarText: "追加中",
       areas: [
         {
           action: {
             label: "買うもの",
-            data: "menu=add:section:2345678901"
+            data: "menu=add:section:2345678901",
+            inputOption: "openKeyboard"
           }
         },
         {
           action: {
             label: "やること",
-            data: "menu=add:section:3456789012"
+            data: "menu=add:section:3456789012",
+            inputOption: "openKeyboard"
           }
         },
         ...expectedSharedAreas
       ]
     });
     expect(loadDefinition("edit-rich-menu.json")).toMatchObject({
+      selected: true,
       name: "state-edit-menu",
       chatBarText: "編集中",
       areas: [
@@ -232,6 +236,7 @@ describe("rich menu definitions", () => {
       ]
     });
     expect(loadDefinition("complete-rich-menu.json")).toMatchObject({
+      selected: true,
       name: "state-complete-menu",
       chatBarText: "完了中",
       areas: [
@@ -251,6 +256,7 @@ describe("rich menu definitions", () => {
       ]
     });
     expect(loadDefinition("delete-rich-menu.json")).toMatchObject({
+      selected: true,
       name: "state-delete-menu",
       chatBarText: "削除中",
       areas: [

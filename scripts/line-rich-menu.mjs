@@ -6,6 +6,8 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { hydrateRichMenuDefinition, loadConfiguredSections } from "./rich-menu-definitions.mjs";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repositoryRoot = path.resolve(__dirname, "..");
@@ -92,6 +94,12 @@ const requestLineApi = async (pathname, options = {}, baseUrl = lineApiBaseUrl) 
 const loadRichMenuDefinition = async (definitionPath) =>
   JSON.parse(await readFile(definitionPath, "utf8"));
 
+const configuredSections = loadConfiguredSections();
+
+const isAliasConflictError = (error) =>
+  error instanceof Error &&
+  (error.message.includes("409") || error.message.includes("conflict richmenu alias id"));
+
 const upsertRichMenuAlias = async (richMenuAliasId, richMenuId) => {
   try {
     await requestLineApi("/v2/bot/richmenu/alias", {
@@ -105,7 +113,7 @@ const upsertRichMenuAlias = async (richMenuAliasId, richMenuId) => {
       })
     });
   } catch (error) {
-    if (!(error instanceof Error) || !error.message.includes("409")) {
+    if (!isAliasConflictError(error)) {
       throw error;
     }
 
@@ -125,7 +133,11 @@ const applyAllRichMenus = async () => {
   const appliedMenus = [];
 
   for (const richMenu of richMenus) {
-    const richMenuDefinition = await loadRichMenuDefinition(richMenu.definitionPath);
+    const richMenuDefinition = hydrateRichMenuDefinition({
+      definition: await loadRichMenuDefinition(richMenu.definitionPath),
+      menuKey: richMenu.key,
+      sections: configuredSections
+    });
     const richMenuImage = await readFile(richMenu.imagePath);
     const createResponse = await requestLineApi("/v2/bot/richmenu", {
     method: "POST",
