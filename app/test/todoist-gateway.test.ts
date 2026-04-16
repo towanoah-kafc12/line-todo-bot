@@ -67,8 +67,8 @@ describe("TodoistGateway", () => {
     });
 
     await expect(gateway.listActiveTasks()).resolves.toMatchObject([
-      { id: "shared-active" },
-      { id: "shared-active-2" }
+      { id: "shared-active", sectionName: "買うもの" },
+      { id: "shared-active-2", sectionName: "やること" }
     ]);
     expect(client.getTasks).toHaveBeenCalledWith({
       projectId: "project-1"
@@ -79,7 +79,7 @@ describe("TodoistGateway", () => {
     const client = {
       getTask: vi.fn(),
       getTasks: vi.fn(),
-      addTask: vi.fn().mockResolvedValue(createTask({ id: "task-added" })),
+      addTask: vi.fn().mockResolvedValue(createTask({ id: "task-added", sectionId: "section-2" })),
       updateTask: vi.fn(),
       closeTask: vi.fn(),
       deleteTask: vi.fn()
@@ -97,7 +97,8 @@ describe("TodoistGateway", () => {
 
     await expect(gateway.addTask("洗剤を買う", "section-2")).resolves.toMatchObject({
       id: "task-added",
-      content: "牛乳を買う"
+      content: "牛乳を買う",
+      sectionName: "やること"
     });
     expect(client.addTask).toHaveBeenCalledWith(
       {
@@ -153,10 +154,12 @@ describe("TodoistGateway", () => {
     });
 
     await expect(gateway.completeTask("task-1")).resolves.toMatchObject({
-      content: "ゴミを出す"
+      content: "ゴミを出す",
+      sectionName: "買うもの"
     });
     await expect(gateway.deleteTask("task-1")).resolves.toMatchObject({
-      content: "ゴミを出す"
+      content: "ゴミを出す",
+      sectionName: "買うもの"
     });
     expect(client.closeTask).toHaveBeenCalledWith("task-1", "req-write");
     expect(client.deleteTask).toHaveBeenCalledWith("task-1", "req-write");

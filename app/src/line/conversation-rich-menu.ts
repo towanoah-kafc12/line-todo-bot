@@ -59,8 +59,9 @@ const resolveAliasFromState = (state: ConversationState | null): RichMenuAliasId
     case "awaiting-edit-content":
       return conversationRichMenuAliases.edit;
     case "awaiting-complete-section":
-    case "awaiting-complete-index":
       return conversationRichMenuAliases.complete;
+    case "awaiting-complete-index":
+      return null;
     case "awaiting-delete-section":
     case "awaiting-delete-index":
       return conversationRichMenuAliases.delete;

@@ -21,6 +21,40 @@ const sectionBounds = [
   }
 ];
 
+const mainSectionColumns = [
+  {
+    x: 160,
+    width: 960
+  },
+  {
+    x: 1380,
+    width: 960
+  }
+];
+
+const mainActionRows = [
+  {
+    menuKey: "list",
+    y: 460,
+    height: 220
+  },
+  {
+    menuKey: "add",
+    y: 720,
+    height: 220
+  },
+  {
+    menuKey: "edit",
+    y: 980,
+    height: 220
+  },
+  {
+    menuKey: "complete",
+    y: 1240,
+    height: 220
+  }
+];
+
 const menuDisplayText = {
   list: (sectionName) => `${sectionName}を表示する`,
   add: (sectionName) => `${sectionName}に追加する`,
@@ -39,6 +73,7 @@ const buildSectionAction = (menuKey, section) => {
 
   if (menuKey === "add") {
     action.inputOption = "openKeyboard";
+    action.fillInText = " ";
   }
 
   return action;
@@ -73,15 +108,33 @@ export const hydrateRichMenuDefinition = ({
   menuKey,
   sections
 }) => {
-  if (menuKey === "main") {
-    return cloneDefinition(definition);
-  }
-
   if (sections.length === 0) {
     return cloneDefinition(definition);
   }
 
   const nextDefinition = cloneDefinition(definition);
+
+  if (menuKey === "main") {
+    if (sections.length !== 2) {
+      return nextDefinition;
+    }
+
+    nextDefinition.areas = sections.flatMap((section, sectionIndex) =>
+      mainActionRows.map((actionRow) => ({
+        bounds: {
+          x: mainSectionColumns[sectionIndex].x,
+          y: actionRow.y,
+          width: mainSectionColumns[sectionIndex].width,
+          height: actionRow.height
+        },
+        action: {
+          ...buildSectionAction(actionRow.menuKey, section)
+        }
+      })),
+    );
+
+    return nextDefinition;
+  }
 
   if (!["list", "add", "edit", "complete", "delete"].includes(menuKey)) {
     return nextDefinition;

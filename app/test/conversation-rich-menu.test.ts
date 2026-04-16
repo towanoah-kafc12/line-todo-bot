@@ -40,6 +40,24 @@ describe("conversation rich menu manager", () => {
     expect(client.unlinkRichMenuIdFromUser).not.toHaveBeenCalled();
   });
 
+  it("unlinks the user menu while complete index selection is active", async () => {
+    const client = {
+      getRichMenuAlias: vi.fn(),
+      linkRichMenuIdToUser: vi.fn(),
+      unlinkRichMenuIdFromUser: vi.fn().mockResolvedValue(undefined)
+    };
+    const manager = createConversationRichMenuManager(client);
+
+    await manager.sync("U1", {
+      type: "awaiting-complete-index",
+      sectionId: "section-1"
+    });
+
+    expect(client.getRichMenuAlias).not.toHaveBeenCalled();
+    expect(client.linkRichMenuIdToUser).not.toHaveBeenCalled();
+    expect(client.unlinkRichMenuIdFromUser).toHaveBeenCalledWith("U1");
+  });
+
   it("unlinks the user menu when conversation ends", async () => {
     const client = {
       getRichMenuAlias: vi.fn(),

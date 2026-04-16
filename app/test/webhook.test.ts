@@ -463,7 +463,7 @@ describe("POST /webhook", () => {
     await expect(indexResponse.json()).resolves.toMatchObject({
       events: [
         {
-          replyMessage: "新しい内容を送って"
+          replyMessage: "新しい内容を送って\n削除したいなら「削除」って送って"
         }
       ]
     });
@@ -475,6 +475,81 @@ describe("POST /webhook", () => {
       ]
     });
     expect(listStateStore.save).toHaveBeenCalledWith("user:U-allowed", ["task-1"]);
+  });
+
+  it("deletes a task from edit conversation when the user sends 削除", async () => {
+    const todoistGateway = createGateway();
+    const listStateStore = {
+      save: vi.fn(),
+      resolve: vi.fn().mockReturnValue("task-1"),
+      clear: vi.fn()
+    };
+    const conversationStateStore = {
+      save: vi.fn(),
+      load: vi
+        .fn()
+        .mockReturnValueOnce({ type: "awaiting-edit-index", sectionId: "2345678901" })
+        .mockReturnValueOnce({ type: "awaiting-edit-index", sectionId: "2345678901" })
+        .mockReturnValueOnce({ type: "awaiting-edit-content", taskId: "task-1", sectionId: "2345678901" })
+        .mockReturnValueOnce({ type: "awaiting-edit-content", taskId: "task-1", sectionId: "2345678901" })
+        .mockReturnValueOnce(null),
+      clear: vi.fn()
+    };
+    const messagingClient = {
+      replyMessage: vi.fn().mockResolvedValue({})
+    };
+    const app = createApp(config, {
+      todoistGateway,
+      listStateStore,
+      conversationStateStore,
+      messagingClient
+    });
+
+    const sectionBody = buildPostbackBody("menu=edit:section:2345678901", "reply-token-1");
+    const indexBody = buildTextBody("1", "reply-token-2");
+    const deleteBody = buildTextBody("削除", "reply-token-3");
+
+    await app.request("/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-line-signature": createSignature(sectionBody)
+      },
+      body: sectionBody
+    });
+    const indexResponse = await app.request("/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-line-signature": createSignature(indexBody)
+      },
+      body: indexBody
+    });
+    const deleteResponse = await app.request("/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-line-signature": createSignature(deleteBody)
+      },
+      body: deleteBody
+    });
+
+    await expect(indexResponse.json()).resolves.toMatchObject({
+      events: [
+        {
+          replyMessage: "新しい内容を送って\n削除したいなら「削除」って送って"
+        }
+      ]
+    });
+    await expect(deleteResponse.json()).resolves.toMatchObject({
+      events: [
+        {
+          replyMessage: "削除したよ: ゴミを出す"
+        }
+      ]
+    });
+    expect(todoistGateway.deleteTask).toHaveBeenCalledWith("task-1");
+    expect(listStateStore.clear).toHaveBeenCalledWith("user:U-allowed");
   });
 
   it("starts and completes complete conversation from rich menu postback", async () => {

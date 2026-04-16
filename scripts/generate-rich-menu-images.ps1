@@ -53,6 +53,8 @@ $stateMenus = @(
   }
 )
 
+$uiFontFamily = "BIZ UDPGothic"
+
 function New-RoundedRectanglePath {
   param(
     [float]$X,
@@ -118,60 +120,55 @@ function New-MainRichMenuImage {
     $graphics.Clear([System.Drawing.Color]::FromArgb(16, 19, 26))
 
     $titleBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(248, 250, 255))
-    $panelBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(21, 25, 36))
-    $panelStroke = New-Object System.Drawing.Pen ([System.Drawing.Color]::FromArgb(40, 64, 77, 104), 2)
-    $showBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(36, 44, 59))
-    $addBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(28, 48, 56))
-    $completeBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(31, 49, 43))
-    $editBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(74, 56, 28))
-    $deleteBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(74, 37, 45))
+    $leftPanelBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(24, 30, 41))
+    $rightPanelBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(22, 34, 39))
+    $showBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(60, 73, 98))
+    $addBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(35, 92, 103))
+    $editBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(111, 83, 41))
+    $completeBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(39, 112, 77))
     $buttonBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(248, 250, 255))
-    $accentBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(58, 115, 240))
-    $decorBrushA = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(20, 58, 115, 240))
-    $decorBrushB = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(20, 255, 184, 76))
+    $sectionFont = New-Object System.Drawing.Font($uiFontFamily, 86, [System.Drawing.FontStyle]::Bold)
+    $buttonFont = New-Object System.Drawing.Font($uiFontFamily, 54, [System.Drawing.FontStyle]::Bold)
 
-    $titleFont = New-Object System.Drawing.Font("Yu Gothic UI", 52, [System.Drawing.FontStyle]::Bold)
-    $primaryFont = New-Object System.Drawing.Font("Yu Gothic UI", 66, [System.Drawing.FontStyle]::Bold)
-    $secondaryFont = New-Object System.Drawing.Font("Yu Gothic UI", 54, [System.Drawing.FontStyle]::Bold)
+    $leftPanelPath = New-RoundedRectanglePath -X 80 -Y 150 -Width 1120 -Height 1360 -Radius 54
+    $rightPanelPath = New-RoundedRectanglePath -X 1300 -Y 150 -Width 1120 -Height 1360 -Radius 54
 
-    $graphics.FillRectangle($accentBrush, 0, 0, 2500, 110)
-    Draw-CenteredText -Graphics $graphics -Text $labelChooseAction -Font $titleFont -Brush $titleBrush -X 0 -Y 150 -Width 2500 -Height 130
+    $graphics.FillPath($leftPanelBrush, $leftPanelPath)
+    $graphics.FillPath($rightPanelBrush, $rightPanelPath)
 
-    $showPath = New-RoundedRectanglePath -X 60 -Y 330 -Width 714 -Height 560 -Radius 44
-    $addPath = New-RoundedRectanglePath -X 893 -Y 330 -Width 714 -Height 560 -Radius 44
-    $completePath = New-RoundedRectanglePath -X 1726 -Y 330 -Width 714 -Height 560 -Radius 44
-    $panelPath = New-RoundedRectanglePath -X 60 -Y 980 -Width 1690 -Height 580 -Radius 44
-    $editPath = New-RoundedRectanglePath -X 1860 -Y 980 -Width 480 -Height 262 -Radius 36
-    $deletePath = New-RoundedRectanglePath -X 1860 -Y 1298 -Width 480 -Height 262 -Radius 36
+    Draw-CenteredText -Graphics $graphics -Text $sectionNames[0] -Font $sectionFont -Brush $titleBrush -X 80 -Y 220 -Width 1120 -Height 180
+    Draw-CenteredText -Graphics $graphics -Text $sectionNames[1] -Font $sectionFont -Brush $titleBrush -X 1300 -Y 220 -Width 1120 -Height 180
 
-    $graphics.FillPath($showBrush, $showPath)
-    $graphics.FillPath($addBrush, $addPath)
-    $graphics.FillPath($completeBrush, $completePath)
-    $graphics.FillPath($panelBrush, $panelPath)
-    $graphics.DrawPath($panelStroke, $panelPath)
-    $graphics.FillPath($editBrush, $editPath)
-    $graphics.FillPath($deleteBrush, $deletePath)
+    $leftCards = @(
+      @{ X = 160; Y = 460; Width = 960; Height = 220; Brush = $showBrush; Label = $labelShow },
+      @{ X = 160; Y = 720; Width = 960; Height = 220; Brush = $addBrush; Label = $labelAdd },
+      @{ X = 160; Y = 980; Width = 960; Height = 220; Brush = $editBrush; Label = $labelEdit },
+      @{ X = 160; Y = 1240; Width = 960; Height = 220; Brush = $completeBrush; Label = $labelComplete }
+    )
+    $rightCards = @(
+      @{ X = 1380; Y = 460; Width = 960; Height = 220; Brush = $showBrush; Label = $labelShow },
+      @{ X = 1380; Y = 720; Width = 960; Height = 220; Brush = $addBrush; Label = $labelAdd },
+      @{ X = 1380; Y = 980; Width = 960; Height = 220; Brush = $editBrush; Label = $labelEdit },
+      @{ X = 1380; Y = 1240; Width = 960; Height = 220; Brush = $completeBrush; Label = $labelComplete }
+    )
 
-    $graphics.FillEllipse($decorBrushA, 170, 1090, 420, 420)
-    $graphics.FillEllipse($decorBrushA, 520, 1160, 250, 250)
-    $graphics.FillEllipse($decorBrushB, 1110, 1020, 320, 320)
-    $graphics.FillEllipse($decorBrushB, 1370, 1260, 190, 190)
+    foreach ($card in $leftCards + $rightCards) {
+      $cardPath = New-RoundedRectanglePath -X $card.X -Y $card.Y -Width $card.Width -Height $card.Height -Radius 34
 
-    Draw-CenteredText -Graphics $graphics -Text $labelShow -Font $primaryFont -Brush $buttonBrush -X 60 -Y 330 -Width 714 -Height 560
-    Draw-CenteredText -Graphics $graphics -Text $labelAdd -Font $primaryFont -Brush $buttonBrush -X 893 -Y 330 -Width 714 -Height 560
-    Draw-CenteredText -Graphics $graphics -Text $labelComplete -Font $primaryFont -Brush $buttonBrush -X 1726 -Y 330 -Width 714 -Height 560
-    Draw-CenteredText -Graphics $graphics -Text $labelEdit -Font $secondaryFont -Brush $buttonBrush -X 1860 -Y 980 -Width 480 -Height 262
-    Draw-CenteredText -Graphics $graphics -Text $labelDelete -Font $secondaryFont -Brush $buttonBrush -X 1860 -Y 1298 -Width 480 -Height 262
+      try {
+        $graphics.FillPath($card.Brush, $cardPath)
+        Draw-CenteredText -Graphics $graphics -Text $card.Label -Font $buttonFont -Brush $buttonBrush -X $card.X -Y $card.Y -Width $card.Width -Height $card.Height
+      }
+      finally {
+        $cardPath.Dispose()
+      }
+    }
 
     $bitmap.Save($OutputPath, [System.Drawing.Imaging.ImageFormat]::Png)
   }
   finally {
-    if ($null -ne $showPath) { $showPath.Dispose() }
-    if ($null -ne $addPath) { $addPath.Dispose() }
-    if ($null -ne $completePath) { $completePath.Dispose() }
-    if ($null -ne $panelPath) { $panelPath.Dispose() }
-    if ($null -ne $editPath) { $editPath.Dispose() }
-    if ($null -ne $deletePath) { $deletePath.Dispose() }
+    if ($null -ne $leftPanelPath) { $leftPanelPath.Dispose() }
+    if ($null -ne $rightPanelPath) { $rightPanelPath.Dispose() }
     $graphics.Dispose()
     $bitmap.Dispose()
   }
@@ -195,17 +192,15 @@ function New-RichMenuImage {
 
   try {
     $background = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(16, 19, 26))
-    $accentBrush = New-Object System.Drawing.SolidBrush $Accent
     $darkBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(240, 244, 251))
     $mutedBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(145, 154, 173))
     $whiteBrush = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(248, 250, 255))
     $graphics.Clear([System.Drawing.Color]::FromArgb(16, 19, 26))
     $graphics.FillRectangle($background, 0, 0, 2500, 1686)
-    $graphics.FillRectangle($accentBrush, 0, 0, 2500, 110)
 
-    $headerFont = New-Object System.Drawing.Font("Yu Gothic UI", 52, [System.Drawing.FontStyle]::Bold)
-    $buttonFont = New-Object System.Drawing.Font("Yu Gothic UI", 42, [System.Drawing.FontStyle]::Bold)
-    $sectionFont = New-Object System.Drawing.Font("Yu Gothic UI", 84, [System.Drawing.FontStyle]::Bold)
+    $headerFont = New-Object System.Drawing.Font($uiFontFamily, 52, [System.Drawing.FontStyle]::Bold)
+    $buttonFont = New-Object System.Drawing.Font($uiFontFamily, 42, [System.Drawing.FontStyle]::Bold)
+    $sectionFont = New-Object System.Drawing.Font($uiFontFamily, 84, [System.Drawing.FontStyle]::Bold)
 
     $graphics.DrawString($Header, $headerFont, $darkBrush, 980, 165)
 

@@ -11,6 +11,138 @@ const loadDefinition = (fileName: string) =>
   JSON.parse(readFileSync(path.join(lineAssetDir, fileName), "utf8"));
 
 describe("rich menu definition hydration", () => {
+  it("replaces the main menu buttons from env config", () => {
+    const sections = loadConfiguredSections({
+      TODOIST_SECTION_IDS: "section-buy,section-do",
+      TODOIST_SECTION_NAMES: "買い物,用事"
+    });
+
+    const definition = hydrateRichMenuDefinition({
+      definition: loadDefinition("default-rich-menu.json"),
+      menuKey: "main",
+      sections
+    });
+
+    expect(definition.areas).toEqual([
+      {
+        bounds: {
+          x: 160,
+          y: 460,
+          width: 960,
+          height: 220
+        },
+        action: {
+          type: "postback",
+          label: "買い物",
+          data: "menu=list:section:section-buy",
+          displayText: "買い物を表示する"
+        }
+      },
+      {
+        bounds: {
+          x: 160,
+          y: 720,
+          width: 960,
+          height: 220
+        },
+        action: {
+          type: "postback",
+          label: "買い物",
+          data: "menu=add:section:section-buy",
+          displayText: "買い物に追加する",
+          inputOption: "openKeyboard",
+          fillInText: " "
+        }
+      },
+      {
+        bounds: {
+          x: 160,
+          y: 980,
+          width: 960,
+          height: 220
+        },
+        action: {
+          type: "postback",
+          label: "買い物",
+          data: "menu=edit:section:section-buy",
+          displayText: "買い物を編集する"
+        }
+      },
+      {
+        bounds: {
+          x: 160,
+          y: 1240,
+          width: 960,
+          height: 220
+        },
+        action: {
+          type: "postback",
+          label: "買い物",
+          data: "menu=complete:section:section-buy",
+          displayText: "買い物を完了する"
+        }
+      },
+      {
+        bounds: {
+          x: 1380,
+          y: 460,
+          width: 960,
+          height: 220
+        },
+        action: {
+          type: "postback",
+          label: "用事",
+          data: "menu=list:section:section-do",
+          displayText: "用事を表示する"
+        }
+      },
+      {
+        bounds: {
+          x: 1380,
+          y: 720,
+          width: 960,
+          height: 220
+        },
+        action: {
+          type: "postback",
+          label: "用事",
+          data: "menu=add:section:section-do",
+          displayText: "用事に追加する",
+          inputOption: "openKeyboard",
+          fillInText: " "
+        }
+      },
+      {
+        bounds: {
+          x: 1380,
+          y: 980,
+          width: 960,
+          height: 220
+        },
+        action: {
+          type: "postback",
+          label: "用事",
+          data: "menu=edit:section:section-do",
+          displayText: "用事を編集する"
+        }
+      },
+      {
+        bounds: {
+          x: 1380,
+          y: 1240,
+          width: 960,
+          height: 220
+        },
+        action: {
+          type: "postback",
+          label: "用事",
+          data: "menu=complete:section:section-do",
+          displayText: "用事を完了する"
+        }
+      }
+    ]);
+  });
+
   it("replaces section buttons from env config", () => {
     const sections = loadConfiguredSections({
       TODOIST_SECTION_IDS: "section-buy,section-do",
@@ -36,7 +168,8 @@ describe("rich menu definition hydration", () => {
           label: "買い物",
           data: "menu=add:section:section-buy",
           displayText: "買い物に追加する",
-          inputOption: "openKeyboard"
+          inputOption: "openKeyboard",
+          fillInText: " "
         }
       },
       {
@@ -51,7 +184,8 @@ describe("rich menu definition hydration", () => {
           label: "用事",
           data: "menu=add:section:section-do",
           displayText: "用事に追加する",
-          inputOption: "openKeyboard"
+          inputOption: "openKeyboard",
+          fillInText: " "
         }
       }
     ]);

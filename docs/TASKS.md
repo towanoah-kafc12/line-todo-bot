@@ -47,7 +47,7 @@
 - [ ] Q-APP-002: 共有運用向けに Todoist project の切替方式を決める
 - [ ] Q-APP-003: 複数 section を 2 から 4 個まで扱う前提と制約を整理する
 - [x] Q-APP-004: リッチメニューから section ごとの表示、追加、削除、編集を呼ぶ導線を実装する
-- [ ] Q-APP-005: リッチメニューの情報設計とビジュアルを作り込む
+- [x] Q-APP-005: リッチメニューの情報設計とビジュアルを作り込む
 - [ ] Q-APP-006: Bot の出力文面と一覧表現を改善する
 
 ## Blocked
@@ -62,3 +62,6 @@
 - [x] 実装順を固定する `docs/implementation-plan.md` を追加した
 - [x] app scaffold、env 検証、Webhook 入口、署名検証、認可、command parser を実装した
 - [x] Todoist gateway、番号付き一覧 state、command handler、Reply API 配線を実装した
+- [x] リッチメニューを section 固定の 2 カラム導線に更新し、表示 / 追加 / 編集 / 完了を 1 タップで始められるようにした
+- [x] トップ rich menu のビジュアル改善、操作色の統一、フォント調整、不要な装飾の削除を反映した
+- [x] 削除を編集 flow に統合し、編集中に `削除` で消せるようにした

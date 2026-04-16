@@ -19,7 +19,8 @@
         "label": "買うもの",
         "data": "menu=add:section:2345678901",
         "displayText": "買うものに追加する",
-        "inputOption": "openKeyboard"
+        "inputOption": "openKeyboard",
+        "fillInText": " "
       }
     },
     {
@@ -34,7 +35,8 @@
         "label": "やること",
         "data": "menu=add:section:3456789012",
         "displayText": "やることに追加する",
-        "inputOption": "openKeyboard"
+        "inputOption": "openKeyboard",
+        "fillInText": " "
       }
     },
     {

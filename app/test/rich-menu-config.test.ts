@@ -21,72 +21,118 @@ describe("rich menu definitions", () => {
       areas: [
         {
           bounds: {
-            x: 0,
-            y: 0,
-            width: 834,
-            height: 720
+            x: 160,
+            y: 460,
+            width: 960,
+            height: 220
           },
           action: {
             type: "postback",
-            label: "表示する",
-            data: "menu=list",
-            displayText: "表示する"
+            label: "買うもの 一覧を見る",
+            data: "menu=list:section:2345678901",
+            displayText: "買うものを表示する"
           }
         },
         {
           bounds: {
-            x: 834,
-            y: 0,
-            width: 833,
-            height: 720
-          },
-          action: {
-            type: "postback",
-            label: "追加する",
-            data: "menu=add",
-            displayText: "タスクを追加する"
-          }
-        },
-        {
-          bounds: {
-            x: 1667,
-            y: 0,
-            width: 833,
-            height: 720
-          },
-          action: {
-            type: "postback",
-            label: "完了する",
-            data: "menu=complete",
-            displayText: "タスクを完了する"
-          }
-        },
-        {
-          bounds: {
-            x: 1860,
+            x: 160,
             y: 720,
-            width: 480,
-            height: 483
+            width: 960,
+            height: 220
           },
           action: {
             type: "postback",
-            label: "編集する",
-            data: "menu=edit",
-            displayText: "タスクを編集する"
+            label: "買うもの 追加する",
+            data: "menu=add:section:2345678901",
+            displayText: "買うものに追加する",
+            inputOption: "openKeyboard",
+            fillInText: " "
           }
         },
         {
           bounds: {
-            x: 1860,
-            y: 1203,
-            width: 480,
-            height: 483
+            x: 160,
+            y: 980,
+            width: 960,
+            height: 220
           },
           action: {
             type: "postback",
-            label: "削除する",
-            data: "menu=delete",
-            displayText: "タスクを削除する"
+            label: "買うもの 編集する",
+            data: "menu=edit:section:2345678901",
+            displayText: "買うものを編集する"
+          }
+        },
+        {
+          bounds: {
+            x: 160,
+            y: 1240,
+            width: 960,
+            height: 220
+          },
+          action: {
+            type: "postback",
+            label: "買うもの 完了する",
+            data: "menu=complete:section:2345678901",
+            displayText: "買うものを完了する"
+          }
+        },
+        {
+          bounds: {
+            x: 1380,
+            y: 460,
+            width: 960,
+            height: 220
+          },
+          action: {
+            type: "postback",
+            label: "やること 一覧を見る",
+            data: "menu=list:section:3456789012",
+            displayText: "やることを表示する"
+          }
+        },
+        {
+          bounds: {
+            x: 1380,
+            y: 720,
+            width: 960,
+            height: 220
+          },
+          action: {
+            type: "postback",
+            label: "やること 追加する",
+            data: "menu=add:section:3456789012",
+            displayText: "やることに追加する",
+            inputOption: "openKeyboard",
+            fillInText: " "
+          }
+        },
+        {
+          bounds: {
+            x: 1380,
+            y: 980,
+            width: 960,
+            height: 220
+          },
+          action: {
+            type: "postback",
+            label: "やること 編集する",
+            data: "menu=edit:section:3456789012",
+            displayText: "やることを編集する"
+          }
+        },
+        {
+          bounds: {
+            x: 1380,
+            y: 1240,
+            width: 960,
+            height: 220
+          },
+          action: {
+            type: "postback",
+            label: "やること 完了する",
+            data: "menu=complete:section:3456789012",
+            displayText: "やることを完了する"
           }
         }
       ]
@@ -202,14 +248,16 @@ describe("rich menu definitions", () => {
           action: {
             label: "買うもの",
             data: "menu=add:section:2345678901",
-            inputOption: "openKeyboard"
+            inputOption: "openKeyboard",
+            fillInText: " "
           }
         },
         {
           action: {
             label: "やること",
             data: "menu=add:section:3456789012",
-            inputOption: "openKeyboard"
+            inputOption: "openKeyboard",
+            fillInText: " "
           }
         },
         ...expectedSharedAreas

@@ -76,6 +76,8 @@ type StartNumberedConversationOptions = {
     | { type: "awaiting-delete-index"; sectionId: string };
 };
 
+const editDeleteCommands = new Set(["削除", "削除する"]);
+
 const formatTaskList = (tasks: SharedTask[]): string => {
   if (tasks.length === 0) {
     return "いまは共有 TODO は空だよ";
@@ -439,7 +441,7 @@ export const handleConversationText = async ({
         taskId,
         sectionId: state.sectionId
       });
-      return "新しい内容を送って";
+      return "新しい内容を送って\n削除したいなら「削除」って送って";
     }
 
     case "awaiting-complete-section": {
@@ -513,6 +515,13 @@ export const handleConversationText = async ({
     }
 
     case "awaiting-edit-content": {
+      if (editDeleteCommands.has(trimmed)) {
+        const task = await gateway.deleteTask(state.taskId);
+        conversationStateStore.clear(scopeKey);
+        listStateStore.clear(scopeKey);
+        return `削除したよ: ${task.content}`;
+      }
+
       if (trimmed.length === 0) {
         return "新しい内容が空だよ";
       }

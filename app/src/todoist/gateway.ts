@@ -61,7 +61,8 @@ export class TodoistGateway {
         }
 
         return left.childOrder - right.childOrder;
-      });
+      })
+      .map((task) => this.withSectionName(task));
   }
 
   async addTask(content: string, sectionId?: string): Promise<Task> {
@@ -80,7 +81,7 @@ export class TodoistGateway {
       this.requestIdFactory(),
     );
 
-    return this.assertSharedTask(task);
+    return this.withSectionName(this.assertSharedTask(task));
   }
 
   async updateTask(taskId: string, content: string): Promise<Task> {
@@ -92,17 +93,17 @@ export class TodoistGateway {
       this.requestIdFactory(),
     );
 
-    return this.assertSharedTask(task);
+    return this.withSectionName(this.assertSharedTask(task));
   }
 
   async completeTask(taskId: string): Promise<Task> {
-    const task = this.assertSharedTask(await this.client.getTask(taskId));
+    const task = this.withSectionName(this.assertSharedTask(await this.client.getTask(taskId)));
     await this.client.closeTask(taskId, this.requestIdFactory());
     return task;
   }
 
   async deleteTask(taskId: string): Promise<Task> {
-    const task = this.assertSharedTask(await this.client.getTask(taskId));
+    const task = this.withSectionName(this.assertSharedTask(await this.client.getTask(taskId)));
     await this.client.deleteTask(taskId, this.requestIdFactory());
     return task;
   }
@@ -117,6 +118,17 @@ export class TodoistGateway {
 
   listSections(): SharedSection[] {
     return [...this.sections];
+  }
+
+  private withSectionName(task: Task): Task & { sectionName?: string } {
+    const section = task.sectionId
+      ? this.sections.find((candidate) => candidate.id === task.sectionId)
+      : null;
+
+    return {
+      ...task,
+      sectionName: section?.name
+    };
   }
 
   private getSectionOrder(sectionId: string | null): number {
