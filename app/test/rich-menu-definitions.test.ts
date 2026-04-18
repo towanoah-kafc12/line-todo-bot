@@ -3,6 +3,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+// @ts-expect-error Local script module is exercised directly in tests.
 import { hydrateRichMenuDefinition, loadConfiguredSections } from "../../scripts/rich-menu-definitions.mjs";
 
 const lineAssetDir = path.resolve(process.cwd(), "assets", "line");

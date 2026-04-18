@@ -203,6 +203,22 @@ npm install
 npm run dev
 ```
 
+Webhook URL 更新までまとめたいなら、次を使う。
+
+```bash
+npm run dev:webhook
+```
+
+このコマンドは、ローカル server の起動確認後に `wrangler tunnel quick-start` を実行して、
+検出した `https://...trycloudflare.com/webhook` を LINE Messaging API の webhook endpoint へ自動設定する。
+その後に webhook test API も呼んで、疎通確認まで行う。
+
+前提:
+
+- `.env` に `LINE_CHANNEL_ACCESS_TOKEN` がある
+- `PORT` は未指定なら `3000`
+- `npx wrangler` が実行できる
+
 ### 3. Expose the local server over HTTPS
 
 LINE は HTTPS と公開 URL を要求するので、ローカル待受のままでは Webhook を受けられない。
@@ -218,6 +234,7 @@ npx wrangler tunnel quick-start http://localhost:3000
 
 - `wrangler tunnel --url http://localhost:3000` は現行版では `Unknown argument: url` になる
 - 公開 URL が表示されたら、その `https://...trycloudflare.com` を Webhook URL のベースに使う
+- `npm run dev:webhook` を使う場合は、この URL 検出と Webhook URL 更新を自動で行う
 
 未確定事項:
 
@@ -308,3 +325,4 @@ npm run rich-menu:delete -- <richMenuId>
 | 2026-04-12 | 0.1 | LINE と Todoist の公式調査に基づく初版作成 | Q-COM-004 |
 | 2026-04-14 | 0.2 | Messaging API で default rich menu を適用する手順を追加 | - |
 | 2026-04-15 | 0.3 | 会話 state ごとの per-user rich menu と生成手順を追加 | Q-APP-004 |
+| 2026-04-18 | 0.4 | dev 起動から Quick Tunnel と Webhook URL 更新までの一括コマンドを追加 | Q-COM-004 |

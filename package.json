@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "npx tsx watch app/src/index.ts",
+    "dev:webhook": "node scripts/dev-webhook-bootstrap.mjs",
     "build": "npx tsc --project tsconfig.json",
     "start": "node dist/app/src/index.js",
     "lint": "npx eslint .",

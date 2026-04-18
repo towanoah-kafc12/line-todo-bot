@@ -18,6 +18,7 @@
   "include": [
     "app/src/**/*.ts",
     "app/test/**/*.ts",
+    "app/test/**/*.d.ts",
     "vitest.config.ts"
   ]
 }

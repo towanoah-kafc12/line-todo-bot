@@ -60,6 +60,25 @@ npm install
 npm run dev
 ```
 
+Webhook URL の更新までまとめてやる場合:
+
+```bash
+npm run dev:webhook
+```
+
+`npm run dev:webhook` は次を順に実行するよ。
+
+- `npm run dev`
+- `npx wrangler tunnel quick-start http://localhost:3000`
+- 検出した公開 URL の `/webhook` を LINE の Webhook endpoint API に設定
+- LINE の webhook test API で疎通確認
+
+前提:
+
+- `.env` に `LINE_CHANNEL_ACCESS_TOKEN` が入っている
+- `npx wrangler` が実行できる
+- `POST /health` ではなく `GET /health` が `200` を返すまで待ってから tunnel を張る
+
 デフォルトでは次の endpoint が立つ。
 
 - `GET /`

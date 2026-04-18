@@ -78,7 +78,8 @@ describe("conversation rich menu manager", () => {
 
     await expect(
       manager.sync("U1", {
-        type: "awaiting-edit-index"
+        type: "awaiting-edit-index",
+        sectionId: "section-1"
       }),
     ).resolves.toBeUndefined();
   });
